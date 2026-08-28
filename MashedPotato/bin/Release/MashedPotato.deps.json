@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "MashedPotato/1.0.0.1": {
+      "MashedPotato/1.0.0.2": {
         "dependencies": {
           "Penumbra.Api": "5.15.1"
         },
@@ -25,7 +25,7 @@
     }
   },
   "libraries": {
-    "MashedPotato/1.0.0.1": {
+    "MashedPotato/1.0.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
