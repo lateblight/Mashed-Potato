@@ -1,11 +1,11 @@
 {
-    "Author": "Avaflow, Ars Magna, Kelvin",
-    "Name": "OopsAllLalafellsSRE",
-    "Punchline": "Turn everyone around you into Lalafells (or other races!)",
-    "Description": "Turn everyone around you into Lalafells (or other races!)\n/polala on = enable plugin.\n/polala off = disable plugin.",
-    "InternalName": "OopsAllLalafellsSRE",
-    "ApplicableVersion": "any",
-    "Tags": [
-        "lalafells"
-    ]
+  "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
+  "Name": "Mashed Potato",
+  "InternalName": "MashedPotato",
+  "AssemblyVersion": "1.0.0.0",
+  "Description": "Mashes all Lalafells into the race of your choice.",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 11,
+  "RepoUrl": "https://github.com/lateblight/Mashed-Potato",
+  "IconUrl": "https://raw.githubusercontent.com/lateblight/Mashed-Potato/main/image/icon.png"
 }
