@@ -1,0 +1,13 @@
+[
+  {
+    "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
+    "Name": "Mashed Potato",
+    "InternalName": "OopsAllLalafellsSRE",
+    "AssemblyVersion": "1.0.0.0",
+    "Description": "Mashes all Lalafells into the race of your choice.",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
+    "DownloadLinkInstall": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/OopsAllLalafellsSRE/bin/x64/Release/OopsAllLalafellsSRE/latest.zip",
+    "IconUrl": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/OopsAllLalafellsSRE/icon.png"
+  }
+]

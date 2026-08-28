@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+    <PropertyGroup>
+        <AssemblyName>MashedPotato</AssemblyName>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Authors>Lateblight, Avaflow, Ars Magna, Kelvin</Authors>
+        <Company></Company>
+        <Version>1.0.0.0</Version>
+        <Description>Mashes all Lalafells into the race of your choice.</Description>
+        <Copyright>AGPL-3.0-or-later</Copyright>
+        <PackageProjectUrl>https://github.com/Lateblight/Mashed-Potato</PackageProjectUrl>
+        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Penumbra.Api" Version="5.15.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="DotNet.ReproducibleBuilds" Version="2.0.2" />
+    </ItemGroup>
+</Project>
