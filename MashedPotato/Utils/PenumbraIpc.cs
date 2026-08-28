@@ -6,7 +6,7 @@ using System;
 
 namespace OopsAllLalafellsSRE.Utils
 {
-    internal class PenumbraIpc(IDalamudPluginInterface pluginInterface) : IDisposable
+    public class PenumbraIpc(IDalamudPluginInterface pluginInterface) : IDisposable
     {
         private readonly RedrawAll redrawAll = new(pluginInterface);
         private readonly EventSubscriber<nint, Guid, nint, nint, nint> creatingCharacterBaseEvent =
