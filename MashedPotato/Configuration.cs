@@ -6,7 +6,7 @@ using static OopsAllLalafellsSRE.Utils.Constant;
 namespace OopsAllLalafellsSRE
 {
     [Serializable]
-    internal class Configuration : IPluginConfiguration
+    public class Configuration : IPluginConfiguration
     {
         public int Version { get; set; } = 0;
         public Race SelectedRace { get; set; } = Race.LALAFELL;
