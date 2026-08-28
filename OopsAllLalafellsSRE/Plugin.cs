@@ -11,15 +11,13 @@ namespace OopsAllLalafellsSRE
 {
     internal sealed class Plugin : IDalamudPlugin
     {
-        public static string Name => "OopsAllLalafellsSRE";
-        private const string CommandName = "/polala";
-
-        public WindowSystem WindowSystem { get; } = new("OopsAllLalafellsSRE");
+        public static string Name => "Mashed Potato";
+        private const string CommandName = "/mash";
+        public WindowSystem WindowSystem { get; } = new("Mashed Potato");
 
         public Plugin(IDalamudPluginInterface pluginInterface)
         {
             Service.pluginInterface = pluginInterface;
-
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
             if (!Service.configuration.stayOn)
@@ -28,37 +26,32 @@ namespace OopsAllLalafellsSRE
             }
 
             Service.configuration.Initialize(pluginInterface);
-
-            _ = pluginInterface.Create<Service>();
             Service.plugin = this;
             Service.penumbraApi = new PenumbraIpc(pluginInterface);
             Service.configWindow = new ConfigWindow(this);
             WindowSystem.AddWindow(Service.configWindow);
-
-            _ = pluginInterface.Create<Drawer>();
-            _ = pluginInterface.Create<Nameplate>();
+            Service.drawer = pluginInterface.Create<Drawer>();
+            Service.nameplate = pluginInterface.Create<Nameplate>();
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            pluginInterface.UiBuilder.OpenMainUi += DrawConfigUI;
 
             Service.commandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "Opens OopsAllLalafellsSRE config menu."
+                HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
             });
         }
 
         public static void OutputChatLine(SeString message)
         {
-            var sb = new SeStringBuilder().AddUiForeground("[OAL] ", 58).Append(message);
+            var sb = new SeStringBuilder().AddUiForeground("[Mashed Potato] ", 58).Append(message);
             Service.chatGui.Print(new XivChatEntry { Message = sb.BuiltString });
         }
 
         public void Dispose()
         {
-            Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
-
             WindowSystem.RemoveAllWindows();
-
             Service.penumbraApi?.Dispose();
             Service.drawer?.Dispose();
             Service.nameplate?.Dispose();
@@ -72,20 +65,23 @@ namespace OopsAllLalafellsSRE
                 Service.configuration.enabled = true;
                 Service.configuration.Save();
                 Service.configWindow.InvokeConfigChanged();
+                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
                 return;
             }
+
             if (args == "off")
             {
                 Service.configuration.enabled = false;
                 Service.configuration.Save();
                 Service.configWindow.InvokeConfigChanged();
+                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
                 return;
             }
+
             Service.configWindow.IsOpen = true;
         }
 
         private void DrawUI() => WindowSystem.Draw();
-
         public static void DrawConfigUI() => Service.configWindow.IsOpen = true;
     }
 }

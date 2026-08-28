@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
-        <Authors></Authors>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Authors>Lateblight, Avaflow, Ars Magna, Kelvin</Authors>
         <Company></Company>
-        <Version>2.0.2.12</Version>
-        <Description>Turn everyone around you into Lalafells (or other races!)</Description>
-        <Copyright></Copyright>
-        <PackageProjectUrl>https://github.com/kelvin124124/OopsAllLalafellsSRE</PackageProjectUrl>
+        <Version>1.0.0.0</Version>
+        <Description>Mashes all Lalafells into the race of your choice.</Description>
+        <Copyright>AGPL-3.0-or-later</Copyright>
+        <PackageProjectUrl>https://github.com/Lateblight/Mashed-Potato</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
     </PropertyGroup>

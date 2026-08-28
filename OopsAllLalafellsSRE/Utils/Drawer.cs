@@ -16,7 +16,8 @@ namespace OopsAllLalafellsSRE.Utils
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
             if (Service.configuration.enabled)
             {
-                Plugin.OutputChatLine("OopsAllLalafellsSRE starting...");
+                // Updated this line so your plugin announces its true name in the chat
+                Plugin.OutputChatLine("Mashed-Potato starting...");
                 RefreshAllPlayers();
             }
         }
@@ -38,9 +39,20 @@ namespace OopsAllLalafellsSRE.Utils
             if (gameObj->ObjectKind != ObjectKind.Pc) return;
 
             var customData = Marshal.PtrToStructure<CharaCustomizeData>(customizePtr);
-            if (customData.Race == Service.configuration.SelectedRace || customData.Race == Race.UNKNOWN)
+            
+            // THE BOUNCER'S NEW RULE:
+            // 3 is the internal game ID for Lalafells. 
+            // If the character loading in is NOT a 3, we stop the code here and let them stay normal.
+            if ((int)customData.Race != 3)
                 return;
 
+            // FAILSAFE: 
+            // If they ARE a Lalafell, but you accidentally selected Lalafell in the plugin menu 
+            // as the race you want to change them into, we stop here so the game doesn't do unnecessary work.
+            if ((int)Service.configuration.SelectedRace == 3 || customData.Race == Race.UNKNOWN)
+                return;
+
+            // If they made it past the checks above, they are a Lalafell! Change them!
             NonNativeID.Add(gameObj->NameString);
             ChangeRace(customData, customizePtr, Service.configuration.SelectedRace);
         }

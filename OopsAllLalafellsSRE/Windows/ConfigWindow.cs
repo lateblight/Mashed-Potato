@@ -11,25 +11,26 @@ internal class ConfigWindow : Window
 {
     private readonly Configuration configuration;
     private readonly string[] race = ["Lalafell", "Hyur", "Elezen", "Miqo'te", "Roegadyn", "Au Ra", "Hrothgar", "Viera"];
-    private int selectedRaceIndex = 0;
+    private int selectedRaceIndex;
     public event Action? OnConfigChanged;
 
     public ConfigWindow(Plugin plugin) : base(
-        "OopsAllLalafellsSRE Configuration Window",
+        "Mashed Potato Configuration",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(285, 160);
+        Size = new Vector2(300, 175);
         SizeCondition = ImGuiCond.Always;
 
         configuration = Service.configuration;
+        selectedRaceIndex = MapRaceToIndex(configuration.SelectedRace);
     }
 
     public override void Draw()
     {
-        // select race
+        // Select Destination Race
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Target Race");
+        ImGui.TextUnformatted("Mash Into:");
         ImGui.SameLine();
         if (ImGui.Combo("###Race", ref selectedRaceIndex, race, race.Length))
         {
@@ -38,27 +39,30 @@ internal class ConfigWindow : Window
             OnConfigChanged?.Invoke();
         }
 
-        // Enabled
-        bool _Enabled = configuration.enabled;
-        if (ImGui.Checkbox("Enable", ref _Enabled))
+        // Enable Toggle
+        bool isEnabled = configuration.enabled;
+        if (ImGui.Checkbox("Enable Mashed Potato", ref isEnabled))
         {
-            configuration.enabled = _Enabled;
+            configuration.enabled = isEnabled;
             configuration.Save();
             OnConfigChanged?.Invoke();
         }
 
-        bool _StayOn = configuration.stayOn;
-        if (ImGui.Checkbox("Stay on", ref _StayOn))
+        // Stay On Toggle
+        bool stayOn = configuration.stayOn;
+        if (ImGui.Checkbox("Keep enabled across logins", ref stayOn))
         {
-            configuration.stayOn = _StayOn;
+            configuration.stayOn = stayOn;
             configuration.Save();
         }
 
         ImGui.Separator();
-        bool _NameHQ = configuration.nameHQ;
-        if (ImGui.Checkbox("Add HQ symbol to native lalafells\n(or other races)", ref _NameHQ))
+
+        // Nameplate Indicator Toggle
+        bool nameHq = configuration.nameHQ;
+        if (ImGui.Checkbox("Show indicator () on mashed Lalafells", ref nameHq))
         {
-            configuration.nameHQ = _NameHQ;
+            configuration.nameHQ = nameHq;
             configuration.Save();
             OnConfigChanged?.Invoke();
         }
@@ -76,12 +80,29 @@ internal class ConfigWindow : Window
             5 => Race.AU_RA,
             6 => Race.HROTHGAR,
             7 => Race.VIERA,
-            _ => Race.LALAFELL,
+            _ => Race.HYUR,
+        };
+    }
+
+    private static int MapRaceToIndex(Race race)
+    {
+        return race switch
+        {
+            Race.LALAFELL => 0,
+            Race.HYUR => 1,
+            Race.ELEZEN => 2,
+            Race.MIQOTE => 3,
+            Race.ROEGADYN => 4,
+            Race.AU_RA => 5,
+            Race.HROTHGAR => 6,
+            Race.VIERA => 7,
+            _ => 1,
         };
     }
 
     public void InvokeConfigChanged()
     {
+        selectedRaceIndex = MapRaceToIndex(configuration.SelectedRace);
         OnConfigChanged?.Invoke();
     }
 }

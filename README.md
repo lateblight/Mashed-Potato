@@ -1,16 +1,17 @@
-# OopsAllLalafellsSRE
+# Mashed Potato
 
-Turn everyone around you into Lalafells (or other races!)
+A Dalamud plugin for Final Fantasy XIV that transforms Lalafells into other playable races via Penumbra IPC.
 
-- Created by: Avaflow
-- Smol update by Ars Magna for to run in 6.2
-- Updated to 7.4 by Kelvin
+## Features
+- Dynamically intercepts character creation base data to alter Lalafell models.
+- Configurable target race (Hyur, Elezen, Miqo'te, Roegadyn, Au Ra, Hrothgar, Viera).
+- Toggleable nameplate indicator on transformed characters.
 
-## Usage
-Add `https://raw.githubusercontent.com/kelvin124124/CustomPlugins/main/pluginmaster.json` and `https://raw.githubusercontent.com/xivdev/Penumbra/master/repo.json` to list of custom repo under Experimental tab in dalamud settings.  
-Install and enable Penumbra and OopsAllLalafellsSRE.
+## Commands
+- `/mash` — Opens the configuration window.
+- `/mash on` — Enables the plugin.
+- `/mash off` — Disables the plugin.
 
-## ⚠️ READ THIS ⚠️
-
-- **Requirement**: This plugin requires [Penumbra](https://github.com/xivdev/Penumbra) (another Dalamud plugin) to be installed and active.
-- **Note**: DO NOT use this plugin to remove specific races.
+## Credits & License
+- Originally based on [OopsAllLalafellsSRE](https://github.com/kelvin124124/OopsAllLalafellsSRE) by **Avaflow**, **Ars Magna**, and **Kelvin**.
+- Licensed under the [AGPL-3.0 License](LICENSE).
