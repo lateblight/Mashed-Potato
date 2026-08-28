@@ -6,6 +6,7 @@
     "AssemblyVersion": "1.0.0.0",
     "Description": "Mashes all Lalafells into the race of your choice.",
     "ApplicableVersion": "any",
+    "DalamudApiLevel": 11,
     "RepoUrl": "https://github.com/lateblight/Mashed-Potato",
     "DownloadLinkInstall": "https://raw.githubusercontent.com/lateblight/Mashed-Potato/main/MashedPotato/bin/Release/MashedPotato/latest.zip",
     "IconUrl": "https://raw.githubusercontent.com/lateblight/Mashed-Potato/main/image/icon.png"
