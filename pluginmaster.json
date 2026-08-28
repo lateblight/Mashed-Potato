@@ -4,12 +4,12 @@
     "Name": "Mashed Potato",
     "Punchline": "Transforms Lalafells into other races.",
     "InternalName": "MashedPotato",
-    "AssemblyVersion": "1.0.0.2",
+    "AssemblyVersion": "1.0.0.3",
     "Description": "Mashes all Lalafells into the race of your choice.",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 15,
-    "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
-    "DownloadLinkInstall": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/MashedPotato/bin/Release/MashedPotato/latest.zip",
-    "IconUrl": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png"
+    "RepoUrl": "https://github.com/lateblight/Mashed-Potato",
+    "DownloadLinkInstall": "https://raw.githubusercontent.com/lateblight/Mashed-Potato/main/MashedPotato/bin/Release/MashedPotato/latest.zip",
+    "IconUrl": "https://raw.githubusercontent.com/lateblight/Mashed-Potato/main/image/icon.png"
   }
 ]
