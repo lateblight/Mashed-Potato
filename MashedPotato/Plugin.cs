@@ -9,7 +9,7 @@ using Penumbra.Api.Enums;
 
 namespace OopsAllLalafellsSRE
 {
-    internal sealed class Plugin : IDalamudPlugin
+    public sealed class Plugin : IDalamudPlugin
     {
         public static string Name => "Mashed Potato";
         private const string CommandName = "/mash";

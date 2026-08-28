@@ -2,7 +2,7 @@
   "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
   "Name": "Mashed Potato",
   "InternalName": "MashedPotato",
-  "AssemblyVersion": "1.0.0.4",
+  "AssemblyVersion": "1.0.0.5",
   "Description": "Mashes all Lalafells into the race of your choice.",
   "ApplicableVersion": "any",
   "RepoUrl": "https://github.com/lateblight/Mashed-Potato",
