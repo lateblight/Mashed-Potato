@@ -5,7 +5,7 @@ using OopsAllLalafellsSRE.Windows;
 
 namespace OopsAllLalafellsSRE.Utils;
 
-internal class Service
+public class Service
 {
     internal static Plugin plugin { get; set; } = null!;
     internal static ConfigWindow configWindow { get; set; } = null!;

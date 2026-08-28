@@ -17,6 +17,9 @@ namespace OopsAllLalafellsSRE
 
         public Plugin(IDalamudPluginInterface pluginInterface)
         {
+            // This line asks Dalamud to populate all the [PluginService] tools in Service.cs
+            pluginInterface.Create<Service>();
+
             Service.pluginInterface = pluginInterface;
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
