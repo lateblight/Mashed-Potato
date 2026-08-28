@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "dgSpecHash": "B43OntyjB+M=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\backu\\.nuget\\packages\\dalamudpackager\\15.0.0\\dalamudpackager.15.0.0.nupkg.sha512",
+    "C:\\Users\\backu\\.nuget\\packages\\dotnet.reproduciblebuilds\\2.0.2\\dotnet.reproduciblebuilds.2.0.2.nupkg.sha512",
+    "C:\\Users\\backu\\.nuget\\packages\\penumbra.api\\5.15.1\\penumbra.api.5.15.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://kamori.goats.dev/nuget/v3/index.json.",
+      "projectPath": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
+      "targetGraphs": []
+    }
+  ]
+}
