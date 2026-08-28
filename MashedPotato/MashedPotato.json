@@ -1,6 +1,7 @@
 {
   "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
   "Name": "Mashed Potato",
+  "Punchline": "Transforms Lalafells into other races.",
   "InternalName": "MashedPotato",
   "AssemblyVersion": "1.0.0.0",
   "Description": "Mashes all Lalafells into the race of your choice.",
