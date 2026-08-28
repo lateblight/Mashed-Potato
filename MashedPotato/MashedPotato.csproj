@@ -6,7 +6,7 @@
         <TargetFramework>net10.0-windows</TargetFramework>
         <Authors>Lateblight, Avaflow, Ars Magna, Kelvin</Authors>
         <Company></Company>
-        <Version>1.0.0.6</Version>
+        <Version>1.0.0.7</Version>
         <Punchline>Transforms Lalafells into other races.</Punchline>
         <Description>Mashes all Lalafells into the race of your choice.</Description>
         <Copyright>AGPL-3.0-or-later</Copyright>
