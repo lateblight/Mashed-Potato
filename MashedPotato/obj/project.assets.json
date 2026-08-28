@@ -103,7 +103,7 @@
     "C:\\Users\\backu\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.0.0.1",
     "restore": {
       "projectUniqueName": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
       "projectName": "MashedPotato",
