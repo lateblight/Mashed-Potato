@@ -14,16 +14,11 @@
         "outputPath": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\NuGet.Config",
           "C:\\Users\\backu\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0-windows"
         ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {},
-          "https://kamori.goats.dev/nuget/v3/index.json": {}
-        },
         "frameworks": {
           "net10.0-windows": {
             "framework": "net10.0-windows7.0",

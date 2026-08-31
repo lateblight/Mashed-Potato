@@ -1,0 +1,14 @@
+[
+  {
+    ""Author"": ""Lateblight"",
+    ""Name"": ""Mashed-Potato"",
+    ""InternalName"": ""MashedPotato"",
+    ""AssemblyVersion"": ""1.0.0.0"",
+    ""Description"": ""Swaps Lalafell character models into a different race."",
+    ""ApplicableVersion"": ""any"",
+    ""RepoUrl"": ""https://github.com/Lateblight/Mashed-Potato"",
+    ""DownloadLinkInstall"": ""https://github.com/Lateblight/Mashed-Potato/releases/download/v1.0.0/Mashed-Potato.zip"",
+    ""DownloadLinkTesting"": ""https://github.com/Lateblight/Mashed-Potato/releases/download/v1.0.0/Mashed-Potato.zip"",
+    ""DownloadLinkUpdate"": ""https://github.com/Lateblight/Mashed-Potato/releases/download/v1.0.0/Mashed-Potato.zip""
+  }
+]
