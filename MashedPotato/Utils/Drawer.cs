@@ -16,7 +16,6 @@ namespace OopsAllLalafellsSRE.Utils
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
             if (Service.configuration.enabled)
             {
-                // Updated this line so your plugin announces its true name in the chat
                 Plugin.OutputChatLine("Mashed-Potato starting...");
                 RefreshAllPlayers();
             }
@@ -38,9 +37,14 @@ namespace OopsAllLalafellsSRE.Utils
             var gameObj = (GameObject*)gameObjectAddress;
             if (gameObj->ObjectKind != ObjectKind.Pc) return;
 
+            var playerName = gameObj->NameString;
+
+            // WHITELIST CHECK: If the player is on your whitelist, ignore them and keep them as a Lalafell
+            if (!string.IsNullOrEmpty(playerName) && Service.configuration.WhitelistedNames.Contains(playerName))
+                return;
+
             var customData = Marshal.PtrToStructure<CharaCustomizeData>(customizePtr);
             
-            // THE BOUNCER'S NEW RULE:
             // 3 is the internal game ID for Lalafells. 
             // If the character loading in is NOT a 3, we stop the code here and let them stay normal.
             if ((int)customData.Race != 3)
@@ -53,7 +57,7 @@ namespace OopsAllLalafellsSRE.Utils
                 return;
 
             // If they made it past the checks above, they are a Lalafell! Change them!
-            NonNativeID.Add(gameObj->NameString);
+            NonNativeID.Add(playerName);
             ChangeRace(customData, customizePtr, Service.configuration.SelectedRace);
         }
 
