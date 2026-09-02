@@ -1,35 +1,29 @@
-using Dalamud.Configuration;
-using Dalamud.Plugin;
 using System;
 using System.Collections.Generic;
-using static OopsAllLalafellsSRE.Utils.Constant;
+using Dalamud.Configuration;
+using Dalamud.Plugin;
 
-namespace OopsAllLalafellsSRE
+namespace MashedPotato;
+
+[Serializable]
+public class Configuration : IPluginConfiguration
 {
-    [Serializable]
-    public class Configuration : IPluginConfiguration
+    public int Version { get; set; } = 1;
+
+    // A collection of trusted player names that bypass any character transformations.
+    // Initialised with case-insensitive handling to prevent duplicate confusion.
+    public HashSet<string> WhitelistedPlayers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [NonSerialized]
+    private IDalamudPluginInterface? pluginInterface;
+
+    public void Initialize(IDalamudPluginInterface dalPluginInterface)
     {
-        public int Version { get; set; } = 0;
-        public Race SelectedRace { get; set; } = Race.LALAFELL;
-        public bool enabled { get; set; } = false;
-        public bool stayOn { get; set; } = false;
-        public bool nameHQ { get; set; } = true;
+        this.pluginInterface = dalPluginInterface;
+    }
 
-        // Whitelist collection for character names to be ignored by the swap
-        public HashSet<string> WhitelistedNames { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-
-        // the below exist just to make saving less cumbersome
-        [NonSerialized]
-        private IDalamudPluginInterface? pluginInterface;
-
-        public void Initialize(IDalamudPluginInterface pluginInterface)
-        {
-            this.pluginInterface = pluginInterface;
-        }
-
-        public void Save()
-        {
-            pluginInterface!.SavePluginConfig(this);
-        }
+    public void Save()
+    {
+        this.pluginInterface!.SavePluginConfig(this);
     }
 }

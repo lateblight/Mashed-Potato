@@ -1,25 +1,70 @@
 <#
 .SYNOPSIS
-    Foolproof Flat-Zip Build Script for Mashed-Potato
+    Automated Build, Version Bump & Flat-Zip Pipeline for Mashed-Potato
 .DESCRIPTION
-    Compiles the plugin, isolates only the required release files, 
-    and zips them flatly with zero nested folders.
+    Automatically increments the patch version across all manifests, 
+    compiles in Release mode, and builds a flat latest.zip archive.
 #>
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [Mashed Potato] Starting Foolproof Build Pipeline" -ForegroundColor Cyan
+Write-Host " [Mashed Potato] Starting Automated Build Pipeline" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-# Step 1: Clean old artifacts
-Write-Host "[1/4] Cleaning old directories..." -ForegroundColor Yellow
+# Step 1: Automatically Bump the Version Number across all files
+Write-Host "[1/5] Auto-incrementing plugin version..." -ForegroundColor Yellow
+$csprojPath = "MashedPotato/MashedPotato.csproj"
+$manifestPath = "MashedPotato/MashedPotato.json"
+$repoPath = "repo.json"
+
+[xml]$csprojXml = Get-Content $csprojPath
+$currentVersion = $csprojXml.Project.PropertyGroup.Version
+Write-Host "Current Version detected: $currentVersion" -ForegroundColor DarkGray
+
+# Parse version parts (e.g., 1.0.0.11 -> Major.Minor.Build.Revision)
+$versionParts = $currentVersion.Split('.')
+if ($versionParts.Length -eq 4) {
+    $buildNum = [int]$versionParts[3] + 1
+    $newVersion = "$($versionParts[0]).$($versionParts[1]).$($versionParts[2]).$buildNum"
+} else {
+    $newVersion = "$currentVersion.1"
+}
+Write-Host "New Bumping Version -> $newVersion" -ForegroundColor Green
+
+# Update MashedPotato.csproj
+$csprojXml.Project.PropertyGroup.Version = $newVersion
+$csprojXml.Save((Resolve-Path $csprojPath))
+
+# Update MashedPotato.json manifest
+if (Test-Path $manifestPath) {
+    $manifestJson = Get-Content $manifestPath -Raw | ConvertFrom-Json
+    $manifestJson.AssemblyVersion = $newVersion
+    $manifestJson | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
+}
+
+# Update repo.json manifest
+if (Test-Path $repoPath) {
+    $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
+    foreach ($entry in $repoJson) {
+        if ($entry.InternalName -eq "MashedPotato") {
+            $entry.AssemblyVersion = $newVersion
+        }
+    }
+    $repoJson | ConvertTo-Json -Depth 10 | Set-Content $repoPath
+}
+
+# Step 2: Clean old build artifacts and locks
+Write-Host "[2/5] Cleaning old directories and releasing file locks..." -ForegroundColor Yellow
+if (Test-Path "latest.zip") {
+    Set-ItemProperty -Path "latest.zip" -Name IsReadOnly -Value $false
+    Remove-Item -Force "latest.zip"
+}
 if (Test-Path "bin") { Remove-Item -Recurse -Force "bin" }
 if (Test-Path "obj") { Remove-Item -Recurse -Force "obj" }
-if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" }
 
-# Step 2: Compile the project
-Write-Host "[2/4] Compiling project in Release mode..." -ForegroundColor Yellow
+# Step 3: Compile the project in Release mode
+Write-Host "[3/5] Compiling project via .NET CLI..." -ForegroundColor Yellow
 Push-Location "MashedPotato"
 dotnet publish -c Release
 Pop-Location
@@ -29,8 +74,8 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-# Step 3: Set up a clean staging folder for flat zipping
-Write-Host "[3/4] Staging files for flat packaging..." -ForegroundColor Yellow
+# Step 4: Stage and flatten files for zip package
+Write-Host "[4/5] Staging files for flat packaging..." -ForegroundColor Yellow
 $publishDir = "MashedPotato/bin/Release/publish"
 $stageDir = "MashedPotato/bin/Release/stage"
 
@@ -41,19 +86,16 @@ if (!(Test-Path $publishDir)) {
 if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
 New-Item -ItemType Directory -Path $stageDir | Out-Null
 
-# Copy ONLY individual files from publish (ignoring any subfolders like 'publish')
 Get-ChildItem -Path $publishDir -File | ForEach-Object {
     Copy-Item $_.FullName -Destination $stageDir -Force
 }
 
-# Step 4: Compress only the staged files into a clean latest.zip in the root
-Write-Host "[4/4] Creating final flat latest.zip..." -ForegroundColor Yellow
+# Step 5: Compress into root latest.zip
+Write-Host "[5/5] Creating final flat latest.zip..." -ForegroundColor Yellow
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::CreateFromDirectory($stageDir, "latest.zip")
-
-# Clean up staging folder
 Remove-Item -Recurse -Force $stageDir
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " Build Complete! Clean flat zip created successfully." -ForegroundColor Green
+Write-Host " Build & Auto-Version Complete ($newVersion Ready)!" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Cyan
