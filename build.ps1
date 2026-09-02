@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    Automated Build, Version Bump & Flat-Zip Pipeline for Mashed-Potato
+    Robust Automated Build, Version Bump & Flat-Zip Pipeline for Mashed-Potato
 .DESCRIPTION
-    Automatically increments the patch version across all manifests, 
+    Automatically increments the patch version across all manifests, handles file locks,
     compiles in Release mode, and builds a flat latest.zip archive.
 #>
 
@@ -22,7 +22,7 @@ $repoPath = "repo.json"
 $currentVersion = $csprojXml.Project.PropertyGroup.Version
 Write-Host "Current Version detected: $currentVersion" -ForegroundColor DarkGray
 
-# Parse version parts (e.g., 1.0.0.11 -> Major.Minor.Build.Revision)
+# Parse version parts (e.g., 1.0.0.12 -> Major.Minor.Build.Revision)
 $versionParts = $currentVersion.Split('.')
 if ($versionParts.Length -eq 4) {
     $buildNum = [int]$versionParts[3] + 1
@@ -54,12 +54,27 @@ if (Test-Path $repoPath) {
     $repoJson | ConvertTo-Json -Depth 10 | Set-Content $repoPath
 }
 
-# Step 2: Clean old build artifacts and locks
+# Step 2: Clean old build artifacts with lock-retry safety
 Write-Host "[2/5] Cleaning old directories and releasing file locks..." -ForegroundColor Yellow
+$maxRetries = 3
+$retryDelay = 1
+
 if (Test-Path "latest.zip") {
-    Set-ItemProperty -Path "latest.zip" -Name IsReadOnly -Value $false
-    Remove-Item -Force "latest.zip"
+    for ($i = 1; $i -le $maxRetries; $i++) {
+        try {
+            Set-ItemProperty -Path "latest.zip" -Name IsReadOnly -Value $false
+            Remove-Item -Force "latest.zip" -ErrorAction Stop
+            break
+        } catch {
+            if ($i -eq $maxRetries) {
+                Write-Warning "[Warning] Could immediately delete latest.zip due to a file lock. Attempting overwrite..."
+            } else {
+                Start-Sleep -Seconds $retryDelay
+            }
+        }
+    }
 }
+
 if (Test-Path "bin") { Remove-Item -Recurse -Force "bin" }
 if (Test-Path "obj") { Remove-Item -Recurse -Force "obj" }
 
@@ -90,10 +105,12 @@ Get-ChildItem -Path $publishDir -File | ForEach-Object {
     Copy-Item $_.FullName -Destination $stageDir -Force
 }
 
-# Step 5: Compress into root latest.zip
+# Step 5: Compress into root latest.zip (using safe overwrite)
 Write-Host "[5/5] Creating final flat latest.zip..." -ForegroundColor Yellow
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::CreateFromDirectory($stageDir, "latest.zip")
+$zipPath = "latest.zip"
+if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+[System.IO.Compression.ZipFile]::CreateFromDirectory($stageDir, $zipPath)
 Remove-Item -Recurse -Force $stageDir
 
 Write-Host "==================================================" -ForegroundColor Cyan
