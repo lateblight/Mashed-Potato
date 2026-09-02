@@ -1,7 +1,9 @@
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using Dalamud.IoC;
 using OopsAllLalafellsSRE.Windows;
 using MashedPotato;
+using MashedPotato.Utils;
 
 namespace OopsAllLalafellsSRE.Utils
 {
@@ -14,6 +16,7 @@ namespace OopsAllLalafellsSRE.Utils
         [PluginService] internal static IPluginLog pluginLog { get; set; } = null!;
         [PluginService] internal static INamePlateGui namePlateGui { get; set; } = null!;
         [PluginService] internal static IGameInteropProvider gameInteropProvider { get; set; } = null!;
+        [PluginService] internal static IContextMenu contextMenu { get; set; } = null!;
 
         internal static Configuration configuration { get; set; } = null!;
         internal static Plugin plugin { get; set; } = null!;
@@ -21,5 +24,6 @@ namespace OopsAllLalafellsSRE.Utils
         internal static ConfigWindow configWindow { get; set; } = null!;
         internal static Drawer drawer { get; set; } = null!;
         internal static Nameplate nameplate { get; set; } = null!;
+        internal static WhitelistManager whitelistManager { get; set; } = null!;
     }
 }

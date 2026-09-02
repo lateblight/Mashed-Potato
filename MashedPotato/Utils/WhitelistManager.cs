@@ -1,6 +1,5 @@
 using System;
 using Dalamud.Game.Gui.ContextMenu;
-using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 
 namespace MashedPotato.Utils;
@@ -17,26 +16,28 @@ public class WhitelistManager : IDisposable
         this.contextMenu = contextMenu;
         this.chatGui = chatGui;
 
-        // Subscribe to world and party list context menu events.
-        this.contextMenu.OnOpenWorldContextMenu += OnOpenContextMenu;
+        // Subscribe to the menu opened event required by API 15.
+        this.contextMenu.OnMenuOpened += OnMenuOpened;
     }
 
-    private void OnOpenContextMenu(IMenuOpenedArgs args)
+    private void OnMenuOpened(IMenuOpenedArgs args)
     {
-        // Check if the target is a valid player character in the game world.
-        if (args.Target is MenuTargetSelection target && target.Object is IPlayerCharacter player)
+        // MenuTargetDefault applies to players clicked in the world, party list, and friends list.
+        if (args.Target is MenuTargetDefault target)
         {
-            string playerName = player.Name.TextValue;
+            string playerName = target.TargetName;
+            
+            // Failsafe to ensure a name actually exists
             if (string.IsNullOrEmpty(playerName)) return;
 
             bool isWhitelisted = configuration.WhitelistedPlayers.Contains(playerName);
             string menuLabel = isWhitelisted ? "Remove from Mashed Potato Whitelist" : "Add to Mashed Potato Whitelist";
 
-            // Add the custom option to the context menu.
+            // Add the custom option to the context menu
             args.AddMenuItem(new MenuItem
             {
                 Name = menuLabel,
-                Callback = _ => ToggleWhitelist(playerName)
+                OnClicked = _ => ToggleWhitelist(playerName)
             });
         }
     }
@@ -59,6 +60,6 @@ public class WhitelistManager : IDisposable
 
     public void Dispose()
     {
-        this.contextMenu.OnOpenWorldContextMenu -= OnOpenContextMenu;
+        this.contextMenu.OnMenuOpened -= OnMenuOpened;
     }
 }

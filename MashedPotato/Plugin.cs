@@ -6,6 +6,8 @@ using Dalamud.Plugin;
 using OopsAllLalafellsSRE.Utils;
 using OopsAllLalafellsSRE.Windows;
 using Penumbra.Api.Enums;
+using MashedPotato; 
+using MashedPotato.Utils;
 
 namespace OopsAllLalafellsSRE
 {
@@ -33,8 +35,13 @@ namespace OopsAllLalafellsSRE
             Service.penumbraApi = new PenumbraIpc(pluginInterface);
             Service.configWindow = new ConfigWindow(this);
             WindowSystem.AddWindow(Service.configWindow);
-            Service.drawer = pluginInterface.Create<Drawer>();
-            Service.nameplate = pluginInterface.Create<Nameplate>();
+            
+            // Reassured the compiler these won't be null
+            Service.drawer = pluginInterface.Create<Drawer>()!;
+            Service.nameplate = pluginInterface.Create<Nameplate>()!;
+            
+            // Initialised the right-click whitelist integration
+            Service.whitelistManager = new WhitelistManager(Service.configuration, Service.contextMenu, Service.chatGui);
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -58,6 +65,7 @@ namespace OopsAllLalafellsSRE
             Service.penumbraApi?.Dispose();
             Service.drawer?.Dispose();
             Service.nameplate?.Dispose();
+            Service.whitelistManager?.Dispose();
             Service.commandManager?.RemoveHandler(CommandName);
         }
 
