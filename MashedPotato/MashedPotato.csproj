@@ -13,7 +13,6 @@
         <PackageProjectUrl>https://github.com/Lateblight/Mashed-Potato</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
-        <!-- Enable automatic Dalamud zip packaging -->
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     </PropertyGroup>
 
