@@ -1,108 +1,91 @@
-using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Windowing;
-using OopsAllLalafellsSRE.Utils;
 using System;
 using System.Numerics;
-using static OopsAllLalafellsSRE.Utils.Constant;
+using Dalamud.Interface.Windowing;
+using ImGuiNET;
+using OopsAllLalafellsSRE.Utils;
+using MashedPotato;
 
-namespace OopsAllLalafellsSRE.Windows;
-
-internal class ConfigWindow : Window
+namespace OopsAllLalafellsSRE.Windows
 {
-    private readonly Configuration configuration;
-    private readonly string[] race = ["Lalafell", "Hyur", "Elezen", "Miqo'te", "Roegadyn", "Au Ra", "Hrothgar", "Viera"];
-    private int selectedRaceIndex;
-    public event Action? OnConfigChanged;
-
-    public ConfigWindow(Plugin plugin) : base(
-        "Mashed Potato Configuration",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse)
+    public class ConfigWindow : Window, IDisposable
     {
-        Size = new Vector2(300, 175);
-        SizeCondition = ImGuiCond.Always;
+        private readonly Plugin plugin;
+        public event Action? OnConfigChanged;
+        private string inputPlayerName = string.Empty;
 
-        configuration = Service.configuration;
-        selectedRaceIndex = MapRaceToIndex(configuration.SelectedRace);
-    }
-
-    public override void Draw()
-    {
-        // Select Destination Race
-        ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Mash Into:");
-        ImGui.SameLine();
-        if (ImGui.Combo("###Race", ref selectedRaceIndex, race, race.Length))
+        public ConfigWindow(Plugin plugin) : base("Mashed Potato Configuration", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoResize)
         {
-            configuration.SelectedRace = MapIndexToRace(selectedRaceIndex);
-            configuration.Save();
-            OnConfigChanged?.Invoke();
+            this.plugin = plugin;
+            Size = new Vector2(400, 300);
+            SizeCondition = ImGuiCond.FirstUseEver;
         }
 
-        // Enable Toggle
-        bool isEnabled = configuration.enabled;
-        if (ImGui.Checkbox("Enable Mashed Potato", ref isEnabled))
+        public void InvokeConfigChanged() => OnConfigChanged?.Invoke();
+
+        public override void Draw()
         {
-            configuration.enabled = isEnabled;
-            configuration.Save();
-            OnConfigChanged?.Invoke();
+            var config = Service.configuration;
+
+            ImGui.Text("Welcome to Mashed Potato settings!");
+            ImGui.Separator();
+
+            bool enabled = config.enabled;
+            if (ImGui.Checkbox("Enable Plugin", ref enabled))
+            {
+                config.enabled = enabled;
+                config.Save();
+                InvokeConfigChanged();
+            }
+
+            bool stayOn = config.stayOn;
+            if (ImGui.Checkbox("Keep Enabled Across Area Changes", ref stayOn))
+            {
+                config.stayOn = stayOn;
+                config.Save();
+            }
+
+            bool nameHQ = config.nameHQ;
+            if (ImGui.Checkbox("Display Indicator Symbol Above Transformed Characters", ref nameHQ))
+            {
+                config.nameHQ = nameHQ;
+                config.Save();
+            }
+
+            ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Text("Trusted Player Whitelist");
+            ImGui.TextWrapped("Players added to this list will never be transformed into other races, keeping them safely as Lalafells.");
+
+            ImGui.SetNextItemWidth(200);
+            ImGui.InputText("##WhitelistedPlayerInput", ref inputPlayerName, 64);
+            ImGui.SameLine();
+
+            if (ImGui.Button("Add Player"))
+            {
+                if (!string.IsNullOrWhiteSpace(inputPlayerName))
+                {
+                    config.WhitelistedPlayers.Add(inputPlayerName.Trim());
+                    config.Save();
+                    inputPlayerName = string.Empty;
+                }
+            }
+
+            ImGui.Spacing();
+            ImGui.BeginChild("WhitelistedPlayersList", new Vector2(0, 120), true);
+            foreach (var player in config.WhitelistedPlayers)
+            {
+                if (ImGui.Button($"Remove##{player}"))
+                {
+                    config.WhitelistedPlayers.Remove(player);
+                    config.Save();
+                    break;
+                }
+                ImGui.SameLine();
+                ImGui.Text(player);
+            }
+            ImGui.EndChild();
         }
 
-        // Stay On Toggle
-        bool stayOn = configuration.stayOn;
-        if (ImGui.Checkbox("Keep enabled across logins", ref stayOn))
-        {
-            configuration.stayOn = stayOn;
-            configuration.Save();
-        }
-
-        ImGui.Separator();
-
-        // Nameplate Indicator Toggle
-        bool nameHq = configuration.nameHQ;
-        if (ImGui.Checkbox("Show indicator () on mashed Lalafells", ref nameHq))
-        {
-            configuration.nameHQ = nameHq;
-            configuration.Save();
-            OnConfigChanged?.Invoke();
-        }
-    }
-
-    private static Race MapIndexToRace(int index)
-    {
-        return index switch
-        {
-            0 => Race.LALAFELL,
-            1 => Race.HYUR,
-            2 => Race.ELEZEN,
-            3 => Race.MIQOTE,
-            4 => Race.ROEGADYN,
-            5 => Race.AU_RA,
-            6 => Race.HROTHGAR,
-            7 => Race.VIERA,
-            _ => Race.HYUR,
-        };
-    }
-
-    private static int MapRaceToIndex(Race race)
-    {
-        return race switch
-        {
-            Race.LALAFELL => 0,
-            Race.HYUR => 1,
-            Race.ELEZEN => 2,
-            Race.MIQOTE => 3,
-            Race.ROEGADYN => 4,
-            Race.AU_RA => 5,
-            Race.HROTHGAR => 6,
-            Race.VIERA => 7,
-            _ => 1,
-        };
-    }
-
-    public void InvokeConfigChanged()
-    {
-        selectedRaceIndex = MapRaceToIndex(configuration.SelectedRace);
-        OnConfigChanged?.Invoke();
+        public void Dispose() { }
     }
 }
