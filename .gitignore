@@ -1,4 +1,12 @@
+# Visual Studio / IDE workspace files
 .vs/
-obj/
-bin/
+.vscode/
 *.user
+*.suo
+
+# Build and compilation outputs
+bin/
+obj/
+
+# Local release package distribution archive
+latest.zip

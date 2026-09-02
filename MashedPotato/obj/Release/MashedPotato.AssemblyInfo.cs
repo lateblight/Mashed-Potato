@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("AGPL-3.0-or-later")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Mashes all Lalafells into the race of your choice.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.10")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.10+5b3bc38026ba697c252714fac9f781561eefc5ac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.10+d21a079e749f5be9131344646d3536431752636a")]
 [assembly: System.Reflection.AssemblyProductAttribute("MashedPotato")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MashedPotato")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.10")]
