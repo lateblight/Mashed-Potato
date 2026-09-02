@@ -13,7 +13,7 @@
     <SourceRoot Include="C:\Users\backu\.nuget\packages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)dotnet.reproduciblebuilds\2.0.2\buildTransitive\DotNet.ReproducibleBuilds.props" Condition="Exists('$(NuGetPackageRoot)dotnet.reproduciblebuilds\2.0.2\buildTransitive\DotNet.ReproducibleBuilds.props')" />
+    <Import Project="$(NuGetPackageRoot)dotnet.reproduciblebuilds\1.2.39\buildTransitive\DotNet.ReproducibleBuilds.props" Condition="Exists('$(NuGetPackageRoot)dotnet.reproduciblebuilds\1.2.39\buildTransitive\DotNet.ReproducibleBuilds.props')" />
     <Import Project="$(NuGetPackageRoot)dalamudpackager\15.0.0\build\DalamudPackager.props" Condition="Exists('$(NuGetPackageRoot)dalamudpackager\15.0.0\build\DalamudPackager.props')" />
   </ImportGroup>
 </Project>

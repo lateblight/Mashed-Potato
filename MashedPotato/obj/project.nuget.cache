@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "LYUB/Mqx+Bk=",
+  "dgSpecHash": "xfx4Nuva45E=",
   "success": true,
   "projectFilePath": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\backu\\.nuget\\packages\\dalamudpackager\\15.0.0\\dalamudpackager.15.0.0.nupkg.sha512",
-    "C:\\Users\\backu\\.nuget\\packages\\dotnet.reproduciblebuilds\\2.0.2\\dotnet.reproduciblebuilds.2.0.2.nupkg.sha512",
+    "C:\\Users\\backu\\.nuget\\packages\\dotnet.reproduciblebuilds\\1.2.39\\dotnet.reproduciblebuilds.1.2.39.nupkg.sha512",
     "C:\\Users\\backu\\.nuget\\packages\\penumbra.api\\5.15.1\\penumbra.api.5.15.1.nupkg.sha512"
   ],
   "logs": []

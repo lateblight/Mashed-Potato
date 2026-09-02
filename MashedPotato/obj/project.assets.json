@@ -12,7 +12,7 @@
           "buildMultiTargeting/DalamudPackager.props": {}
         }
       },
-      "DotNet.ReproducibleBuilds/2.0.2": {
+      "DotNet.ReproducibleBuilds/1.2.39": {
         "type": "package",
         "build": {
           "buildTransitive/DotNet.ReproducibleBuilds.props": {},
@@ -59,10 +59,10 @@
         "tasks/netstandard2.1/YamlDotNet.dll"
       ]
     },
-    "DotNet.ReproducibleBuilds/2.0.2": {
-      "sha512": "VaHoEN6YHp0jXucxm67vfuRy8zo9ufiKSuaZ4ZudRi8xmWcEFMKxfCsg2nvYNvdISFTURDu+IHqADGh53+Bamw==",
+    "DotNet.ReproducibleBuilds/1.2.39": {
+      "sha512": "fcFN01tDTIQqDuTwr1jUQK/geofiwjG5DycJQOnC72i1SsLAk1ELe+apBOuZ11UMQG8YKFZG1FgvjZPbqHyatg==",
       "type": "package",
-      "path": "dotnet.reproduciblebuilds/2.0.2",
+      "path": "dotnet.reproduciblebuilds/1.2.39",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -73,7 +73,7 @@
         "buildMultiTargeting/DotNet.ReproducibleBuilds.targets",
         "buildTransitive/DotNet.ReproducibleBuilds.props",
         "buildTransitive/DotNet.ReproducibleBuilds.targets",
-        "dotnet.reproduciblebuilds.2.0.2.nupkg.sha512",
+        "dotnet.reproduciblebuilds.1.2.39.nupkg.sha512",
         "dotnet.reproduciblebuilds.nuspec"
       ]
     },
@@ -95,7 +95,7 @@
   "projectFileDependencyGroups": {
     "net10.0-windows": [
       "DalamudPackager >= 15.0.0",
-      "DotNet.ReproducibleBuilds >= 2.0.2",
+      "DotNet.ReproducibleBuilds >= 1.2.39",
       "Penumbra.Api >= 5.15.1"
     ]
   },
@@ -103,7 +103,7 @@
     "C:\\Users\\backu\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0.15",
+    "version": "1.0.0.16",
     "restore": {
       "projectUniqueName": "C:\\Users\\backu\\Documents\\GitHub\\Mashed-Potato\\MashedPotato\\MashedPotato.csproj",
       "projectName": "MashedPotato",
@@ -151,7 +151,7 @@
           "DotNet.ReproducibleBuilds": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[2.0.2, )"
+            "version": "[1.2.39, )"
           },
           "Penumbra.Api": {
             "target": "Package",
