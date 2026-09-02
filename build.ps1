@@ -1,66 +1,59 @@
 <#
 .SYNOPSIS
-    Automated Build & Packaging Script for Mashed-Potato
+    Foolproof Flat-Zip Build Script for Mashed-Potato
 .DESCRIPTION
-    Compiles the project in Release mode, locates the compiled output inside the publish directory,
-    and creates a clean flat-structured latest.zip containing only the raw plugin files.
+    Compiles the plugin, isolates only the required release files, 
+    and zips them flatly with zero nested folders.
 #>
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [Mashed Potato] Starting Build & Flat-Zip Pipeline" -ForegroundColor Cyan
+Write-Host " [Mashed Potato] Starting Foolproof Build Pipeline" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-# Step 1: Clean previous build artifacts
-Write-Host "[1/4] Cleaning old build directories..." -ForegroundColor Yellow
+# Step 1: Clean old artifacts
+Write-Host "[1/4] Cleaning old directories..." -ForegroundColor Yellow
 if (Test-Path "bin") { Remove-Item -Recurse -Force "bin" }
 if (Test-Path "obj") { Remove-Item -Recurse -Force "obj" }
 if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" }
 
-# Step 2: Compile project via .NET CLI
-Write-Host "[2/4] Compiling project in Release configuration..." -ForegroundColor Yellow
+# Step 2: Compile the project
+Write-Host "[2/4] Compiling project in Release mode..." -ForegroundColor Yellow
 Push-Location "MashedPotato"
 dotnet publish -c Release
 Pop-Location
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "[Error] Build failed during compilation. Please check code errors above."
+    Write-Error "[Error] Compilation failed."
     exit $LASTEXITCODE
 }
 
-# Step 3: Locate the inner publish folder
-Write-Host "[3/4] Locating publish output..." -ForegroundColor Yellow
+# Step 3: Set up a clean staging folder for flat zipping
+Write-Host "[3/4] Staging files for flat packaging..." -ForegroundColor Yellow
 $publishDir = "MashedPotato/bin/Release/publish"
+$stageDir = "MashedPotato/bin/Release/stage"
 
 if (!(Test-Path $publishDir)) {
     $publishDir = Get-ChildItem -Path "MashedPotato/bin/Release" -Filter "publish" -Recurse | Select-Object -First 1 | Select-Object -ExpandProperty FullName
 }
 
-# Step 4: Create a clean flat zip directly from the contents inside publish (excluding the folder itself)
-if (Test-Path $publishDir) {
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    
-    # Create temporary staging directory or zip directly from contents
-    $tempZipDir = "MashedPotato/bin/Release/zip_temp"
-    if (Test-Path $tempZipDir) { Remove-Item -Recurse -Force $tempZipDir }
-    New-Item -ItemType Directory -Path $tempZipDir | Out-Null
-    
-    # Copy all files INSIDE publish directly to temp root
-    Copy-Item "$publishDir\*.*" -Destination $tempZipDir -Force
-    
-    # Create the final zip from the flattened contents
-    [System.IO.Compression.ZipFile]::CreateFromDirectory($tempZipDir, "latest.zip")
-    
-    # Clean up temp folder
-    Remove-Item -Recurse -Force $tempZipDir
-    
-    Write-Host "[4/4] Success! Created clean, flat-structured latest.zip in root." -ForegroundColor Green
-} else {
-    Write-Error "[Error] Could not locate the compiled publish directory to zip."
-    exit 1
+if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
+New-Item -ItemType Directory -Path $stageDir | Out-Null
+
+# Copy ONLY individual files from publish (ignoring any subfolders like 'publish')
+Get-ChildItem -Path $publishDir -File | ForEach-Object {
+    Copy-Item $_.FullName -Destination $stageDir -Force
 }
 
+# Step 4: Compress only the staged files into a clean latest.zip in the root
+Write-Host "[4/4] Creating final flat latest.zip..." -ForegroundColor Yellow
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::CreateFromDirectory($stageDir, "latest.zip")
+
+# Clean up staging folder
+Remove-Item -Recurse -Force $stageDir
+
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " Build Complete! Ready to commit and push to GitHub." -ForegroundColor Green
+Write-Host " Build Complete! Clean flat zip created successfully." -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Cyan
