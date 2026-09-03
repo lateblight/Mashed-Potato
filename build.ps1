@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Robust Automated Build, Version Bump & Flat-Zip Pipeline for Mashed-Potato
+    Robust Automated Build, Version Bump & Dalamud-Compliant Zip Pipeline
 .DESCRIPTION
-    Automatically increments the patch version across all manifests, handles file locks,
-    compiles in Release mode, and builds a flat latest.zip archive.
+    Automatically increments the patch version, compiles in Release mode, 
+    and builds a latest.zip archive with the required InternalName root folder.
 #>
 
 $ErrorActionPreference = "Stop"
@@ -43,10 +43,10 @@ if (Test-Path $manifestPath) {
     $manifestJson | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
 }
 
-# Update repo.json manifest (FIXED: Forces PowerShell to keep the [ ] brackets)
+# Update repo.json manifest
 if (Test-Path $repoPath) {
     $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
-    $repoArray = @($repoJson) # Force it into a strict array format
+    $repoArray = @($repoJson)
     
     foreach ($entry in $repoArray) {
         if ($entry.InternalName -eq "MashedPotato") {
@@ -54,7 +54,6 @@ if (Test-Path $repoPath) {
         }
     }
     
-    # Use -InputObject to prevent ConvertTo-Json from stripping the brackets
     ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath
 }
 
@@ -71,7 +70,7 @@ if (Test-Path "latest.zip") {
             break
         } catch {
             if ($i -eq $maxRetries) {
-                Write-Warning "[Warning] Could immediately delete latest.zip due to a file lock. Attempting overwrite..."
+                Write-Warning "[Warning] Could not immediately delete latest.zip due to a file lock."
             } else {
                 Start-Sleep -Seconds $retryDelay
             }
@@ -93,29 +92,36 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-# Step 4: Stage and flatten files for zip package
-Write-Host "[4/5] Staging files for flat packaging..." -ForegroundColor Yellow
+# Step 4: Stage files into the required InternalName folder
+Write-Host "[4/5] Staging files into Dalamud-compliant folder structure..." -ForegroundColor Yellow
 $publishDir = "MashedPotato/bin/Release/publish"
-$stageDir = "MashedPotato/bin/Release/stage"
+$stageRootDir = "MashedPotato/bin/Release/stage"
+$pluginFolder = "$stageRootDir/MashedPotato" # This folder name MUST exactly match your InternalName
 
 if (!(Test-Path $publishDir)) {
     $publishDir = Get-ChildItem -Path "MashedPotato/bin/Release" -Filter "publish" -Recurse | Select-Object -First 1 | Select-Object -ExpandProperty FullName
 }
 
-if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
-New-Item -ItemType Directory -Path $stageDir | Out-Null
+if (Test-Path $stageRootDir) { Remove-Item -Recurse -Force $stageRootDir }
+New-Item -ItemType Directory -Path $pluginFolder -Force | Out-Null
 
+# Copy all compiled files INTO the MashedPotato subfolder
 Get-ChildItem -Path $publishDir -File | ForEach-Object {
-    Copy-Item $_.FullName -Destination $stageDir -Force
+    Copy-Item $_.FullName -Destination $pluginFolder -Force
 }
 
-# Step 5: Compress into root latest.zip (using safe overwrite)
-Write-Host "[5/5] Creating final flat latest.zip..." -ForegroundColor Yellow
+# Failsafe: Force overwrite the manifest directly from source to beat aggressive compiler caching
+Copy-Item $manifestPath -Destination $pluginFolder -Force
+
+# Step 5: Compress into latest.zip
+Write-Host "[5/5] Creating final latest.zip..." -ForegroundColor Yellow
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zipPath = "latest.zip"
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
-[System.IO.Compression.ZipFile]::CreateFromDirectory($stageDir, $zipPath)
-Remove-Item -Recurse -Force $stageDir
+
+# Zip the root stage folder so the "MashedPotato" folder is safely tucked inside the archive
+[System.IO.Compression.ZipFile]::CreateFromDirectory($stageRootDir, $zipPath)
+Remove-Item -Recurse -Force $stageRootDir
 
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " Build & Auto-Version Complete ($newVersion Ready)!" -ForegroundColor Green
