@@ -25,6 +25,7 @@ namespace OopsAllLalafellsSRE
             Service.pluginInterface = pluginInterface;
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
+            // We do a quick check on startup just in case
             if (!Service.configuration.stayOn)
             {
                 Service.configuration.enabled = false;
@@ -51,6 +52,9 @@ namespace OopsAllLalafellsSRE
             {
                 HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
             });
+
+            // EVENT HOOK: Listen for when the player changes areas (loading screens)
+            Service.clientState.TerritoryChanged += OnTerritoryChanged;
         }
 
         public static void OutputChatLine(SeString message)
@@ -61,12 +65,36 @@ namespace OopsAllLalafellsSRE
 
         public void Dispose()
         {
+            // Clean up our event hook so it doesn't cause memory leaks when the plugin is disabled
+            Service.clientState.TerritoryChanged -= OnTerritoryChanged;
+
             WindowSystem.RemoveAllWindows();
             Service.penumbraApi?.Dispose();
             Service.drawer?.Dispose();
             Service.nameplate?.Dispose();
             Service.whitelistManager?.Dispose();
             Service.commandManager?.RemoveHandler(CommandName);
+        }
+
+        private void OnTerritoryChanged(ushort territoryId)
+        {
+            // AREA CHANGE CHECK: 
+            // If the player has "Keep Enabled Across Area Changes" turned OFF, and the plugin is currently ON...
+            if (!Service.configuration.stayOn && Service.configuration.enabled)
+            {
+                // Turn it off!
+                Service.configuration.enabled = false;
+                Service.configuration.Save();
+                
+                // Tell the UI menu to update its checkbox so it matches our new state
+                Service.configWindow.InvokeConfigChanged();
+                
+                // Ask Penumbra to redraw everyone back to their normal, non-Lalafell selves
+                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
+                
+                // Leave a friendly little note in the chat so the player knows what happened
+                OutputChatLine("You entered a new area. Mashed Potato has automatically turned off.");
+            }
         }
 
         private void OnCommand(string command, string args)
