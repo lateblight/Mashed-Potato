@@ -43,15 +43,19 @@ if (Test-Path $manifestPath) {
     $manifestJson | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
 }
 
-# Update repo.json manifest
+# Update repo.json manifest (FIXED: Forces PowerShell to keep the [ ] brackets)
 if (Test-Path $repoPath) {
     $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
-    foreach ($entry in $repoJson) {
+    $repoArray = @($repoJson) # Force it into a strict array format
+    
+    foreach ($entry in $repoArray) {
         if ($entry.InternalName -eq "MashedPotato") {
             $entry.AssemblyVersion = $newVersion
         }
     }
-    $repoJson | ConvertTo-Json -Depth 10 | Set-Content $repoPath
+    
+    # Use -InputObject to prevent ConvertTo-Json from stripping the brackets
+    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath
 }
 
 # Step 2: Clean old build artifacts with lock-retry safety
@@ -75,8 +79,8 @@ if (Test-Path "latest.zip") {
     }
 }
 
-if (Test-Path "bin") { Remove-Item -Recurse -Force "bin" }
-if (Test-Path "obj") { Remove-Item -Recurse -Force "obj" }
+if (Test-Path "MashedPotato/bin") { Remove-Item -Recurse -Force "MashedPotato/bin" }
+if (Test-Path "MashedPotato/obj") { Remove-Item -Recurse -Force "MashedPotato/obj" }
 
 # Step 3: Compile the project in Release mode
 Write-Host "[3/5] Compiling project via .NET CLI..." -ForegroundColor Yellow
