@@ -76,9 +76,26 @@ namespace OopsAllLalafellsSRE
             Service.commandManager?.RemoveHandler(CommandName);
         }
 
-        private void OnTerritoryChanged(ushort territoryId)
+        // ==============================================================================
+        // THE MASTER KEYRING: METHOD OVERLOADING
+        // Dalamud API 15 changed the hidden signature for TerritoryChanged.
+        // By providing all reasonable data combinations below, the C# compiler will 
+        // automatically select the exact fit and route it to our HandleAreaChange logic!
+        // ==============================================================================
+        private void OnTerritoryChanged() => HandleAreaChange();
+        private void OnTerritoryChanged(ushort a) => HandleAreaChange();
+        private void OnTerritoryChanged(uint a) => HandleAreaChange();
+        private void OnTerritoryChanged(int a) => HandleAreaChange();
+        private void OnTerritoryChanged(ushort a, ushort b) => HandleAreaChange();
+        private void OnTerritoryChanged(uint a, uint b) => HandleAreaChange();
+        private void OnTerritoryChanged(int a, int b) => HandleAreaChange();
+        private void OnTerritoryChanged(object? a, ushort b) => HandleAreaChange();
+        private void OnTerritoryChanged(object? a, uint b) => HandleAreaChange();
+        private void OnTerritoryChanged(object? a, int b) => HandleAreaChange();
+
+        // The actual logic that runs when the player passes through a loading screen
+        private void HandleAreaChange()
         {
-            // AREA CHANGE CHECK: 
             // If the player has "Keep Enabled Across Area Changes" turned OFF, and the plugin is currently ON...
             if (!Service.configuration.stayOn && Service.configuration.enabled)
             {
