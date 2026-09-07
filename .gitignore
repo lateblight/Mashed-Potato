@@ -1,12 +1,17 @@
-# Visual Studio / IDE workspace files
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio / VS Code
 .vs/
-.vscode/
 *.user
 *.suo
 
-# Build and compilation outputs
-bin/
-obj/
-
-# Local release package distribution archive
+# Automated Pipeline Packages
 latest.zip
+MashedPotato/stage/
+MashedPotato/lib/
