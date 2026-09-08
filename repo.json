@@ -1,21 +1,16 @@
-﻿[
-    {
-        "value":  [
-                      {
-                          "Author":  "Lateblight, Avaflow, Ars Magna, Kelvin",
-                          "Name":  "Mashed Potato",
-                          "Punchline":  "Transforms Lalafells into other races.",
-                          "InternalName":  "MashedPotato",
-                          "AssemblyVersion":  "1.2.0.1",
-                          "Description":  "Mashes all Lalafells into the race of your choice.",
-                          "ApplicableVersion":  "any",
-                          "DalamudApiLevel":  15,
-                          "RepoUrl":  "https://github.com/Lateblight/Mashed-Potato",
-                          "DownloadLinkInstall":  "https://github.com/Lateblight/Mashed-Potato/releases/latest/download/latest.zip",
-                          "DownloadLinkUpdate":  "https://github.com/Lateblight/Mashed-Potato/releases/latest/download/latest.zip",
-                          "IconUrl":  "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/refs/heads/main/image/icon.png"
-                      }
-                  ],
-        "Count":  1
-    }
+[
+  {
+    "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
+    "Name": "Mashed Potato",
+    "Punchline": "Transforms Lalafells into other races.",
+    "InternalName": "MashedPotato",
+    "AssemblyVersion": "1.2.0.3",
+    "Description": "Mashes all Lalafells into the race of your choice.",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 15,
+    "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
+    "DownloadLinkInstall": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/refs/heads/main/latest.zip",
+    "DownloadLinkUpdate": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/refs/heads/main/latest.zip",
+    "IconUrl": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/refs/heads/main/image/icon.png"
+  }
 ]
