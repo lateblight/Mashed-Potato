@@ -1,5 +1,4 @@
-# File: ./build.ps1
-
+# File: build.ps1
 
 <#
 .SYNOPSIS
@@ -21,7 +20,6 @@ foreach ($file in $sourceFiles) {
     $relativePath = (Resolve-Path -Relative $file.FullName).Replace('\', '/')
     $content = Get-Content $file.FullName -Raw
     
-    # Skip if the file is completely empty to prevent null-value errors
     if ([string]::IsNullOrEmpty($content)) { continue }
 
     $expectedHeader = "// File: $relativePath"
@@ -85,10 +83,9 @@ $stageDir = "MashedPotato/stage"
 if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
 if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" -ErrorAction SilentlyContinue }
 
-Write-Host "[4/6] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Yellow
-Push-Location "MashedPotato"
-dotnet publish -c Release -o "stage"
-Pop-Location
+Write-Host "[4/6] Compiling .NET 10 project from solution root..." -ForegroundColor Yellow
+dotnet restore Mashed-Potato.sln
+dotnet publish MashedPotato/MashedPotato.csproj -c Release -o "MashedPotato/stage"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "[Error] Compilation failed."
