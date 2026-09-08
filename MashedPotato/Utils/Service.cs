@@ -1,6 +1,5 @@
 // File: ./MashedPotato/Utils/Service.cs
 
-// Mashed-Potato/MashedPotato/Utils/Service.cs
 
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.IoC;

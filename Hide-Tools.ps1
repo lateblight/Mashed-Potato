@@ -40,6 +40,19 @@ $scriptsToHide = @(
     "Fix-Xml.ps1",
     "ProjectDump.ps1",
     "ProjectDump.txt"
+    # 3. Move all the utility scripts safely out of the root directory
+$scriptsToHide = @(
+    "Clean-Repo.ps1",
+    "Fix-NuGet.ps1",
+    "Fix-Penumbra.ps1",
+    "Fix-TheFinalBoss.ps1",
+    "Fix-VSCode.ps1",
+    "Fix-Workspace.ps1",
+    "Fix-Xml.ps1",
+    "ProjectDump.ps1",
+    "ProjectDump_Output.txt",
+    "Deploy-Local.ps1"
+)
 )
 
 foreach ($script in $scriptsToHide) {

@@ -15,3 +15,7 @@ x86/
 latest.zip
 MashedPotato/stage/
 MashedPotato/lib/
+
+# Local helper scripts and dumps
+ProjectDump.ps1
+ProjectDump_Output.txt
