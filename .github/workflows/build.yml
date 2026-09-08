@@ -38,15 +38,30 @@ jobs:
           Invoke-WebRequest -Uri "https://goatcorp.github.io/dalamud-distrib/latest.zip" -OutFile "dalamud.zip"
           Expand-Archive -Force dalamud.zip "$env:APPDATA\XIVLauncher\addon\Hooks\dev\"
 
-      # Grab the Penumbra zip, unzip it, and nick the two DLLs we need for offline compiling
+      # Grab the Penumbra zip, unzip it, and dynamically hunt down the DLLs anywhere inside
       - name: Fetch Penumbra API & Luna
         shell: powershell
         run: |
           Invoke-WebRequest -Uri "https://github.com/xivdev/Penumbra/releases/latest/download/Penumbra.zip" -OutFile "penumbra.zip"
           Expand-Archive -Force penumbra.zip "penumbra_temp"
           New-Item -ItemType Directory -Force -Path "MashedPotato/lib"
-          Copy-Item "penumbra_temp/Penumbra/Penumbra.Api.dll" -Destination "MashedPotato/lib/Penumbra.Api.dll" -Force
-          Copy-Item "penumbra_temp/Penumbra/Luna.dll" -Destination "MashedPotato/lib/Luna.dll" -Force
+          
+          $apiFile = Get-ChildItem -Path "penumbra_temp" -Filter "Penumbra.Api.dll" -Recurse | Select-Object -First 1
+          $lunaFile = Get-ChildItem -Path "penumbra_temp" -Filter "Luna.dll" -Recurse | Select-Object -First 1
+          
+          if ($apiFile) {
+              Copy-Item $apiFile.FullName -Destination "MashedPotato/lib/Penumbra.Api.dll" -Force
+              Write-Host "Found and copied Penumbra.Api.dll successfully!"
+          } else {
+              throw "Could not find Penumbra.Api.dll in the downloaded zip!"
+          }
+          
+          if ($lunaFile) {
+              Copy-Item $lunaFile.FullName -Destination "MashedPotato/lib/Luna.dll" -Force
+              Write-Host "Found and copied Luna.dll successfully!"
+          } else {
+              throw "Could not find Luna.dll in the downloaded zip!"
+          }
 
       # Tell our manifest to point people to the proper release page, not the raw code
       - name: Route repo.json to GitHub Releases
@@ -94,4 +109,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
