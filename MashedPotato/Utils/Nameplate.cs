@@ -1,7 +1,7 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.Gui.NamePlate;
 
-namespace OopsAllLalafellsSRE.Utils
+namespace MashedPotato.Utils
 {
     internal class Nameplate
     {

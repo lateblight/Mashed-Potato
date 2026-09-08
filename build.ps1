@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Bulletproof Automated Build & Flat-Zip Pipeline for Dalamud API 15
+    Bulletproof Automated Build & Flat-Zip Pipeline for Mashed-Potato
 #>
 
 $ErrorActionPreference = "Stop"
@@ -14,8 +14,17 @@ $csprojPath = "MashedPotato/MashedPotato.csproj"
 $manifestPath = "MashedPotato/MashedPotato.json"
 $repoPath = "repo.json"
 
-[xml]$csprojXml = Get-Content $csprojPath
-$currentVersion = $csprojXml.Project.PropertyGroup.Version
+# Read .csproj as plain text to find the version securely via Regex
+$csprojContent = Get-Content $csprojPath -Raw
+if ($csprojContent -match '<Version>(.*?)</Version>') {
+    $currentVersion = $Matches[1]
+} else {
+    $currentVersion = "1.1.0.0"
+}
+
+Write-Host "Current Version detected: $currentVersion" -ForegroundColor DarkGray
+
+# Parse and bump version parts (Major.Minor.Build.Revision)
 $versionParts = $currentVersion.Split('.')
 if ($versionParts.Length -eq 4) {
     $buildNum = [int]$versionParts[3] + 1
@@ -25,15 +34,23 @@ if ($versionParts.Length -eq 4) {
 }
 Write-Host "Bumping Version -> $newVersion" -ForegroundColor Green
 
-$csprojXml.Project.PropertyGroup.Version = $newVersion
-$csprojXml.Save((Resolve-Path $csprojPath))
+# Update .csproj text cleanly using Regex replacement
+if ($csprojContent -match '<Version>.*?</Version>') {
+    $csprojContent = $csprojContent -replace '<Version>.*?</Version>', "<Version>$newVersion</Version>"
+} else {
+    # If tag doesn't exist, inject it right into the first PropertyGroup
+    $csprojContent = $csprojContent -replace '<PropertyGroup>', "<PropertyGroup>`n    <Version>$newVersion</Version>"
+}
+Set-Content -Path $csprojPath -Value $csprojContent -NoNewline
 
+# Update MashedPotato.json manifest
 if (Test-Path $manifestPath) {
     $manifestJson = Get-Content $manifestPath -Raw | ConvertFrom-Json
     $manifestJson.AssemblyVersion = $newVersion
     $manifestJson | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
 }
 
+# Update repo.json manifest
 if (Test-Path $repoPath) {
     $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
     $repoArray = @($repoJson)
@@ -50,14 +67,13 @@ $stageDir = "MashedPotato/stage"
 if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
 if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" -ErrorAction SilentlyContinue }
 
-Write-Host "[3/5] Compiling .NET 8 project directly to staging folder..." -ForegroundColor Yellow
+Write-Host "[3/5] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Yellow
 Push-Location "MashedPotato"
-# The -o flag forces all compiled files directly into our staging folder safely
 dotnet publish -c Release -o "stage"
 Pop-Location
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "[Error] Compilation failed. Please ensure you have the .NET 8 SDK installed."
+    Write-Error "[Error] Compilation failed."
     exit $LASTEXITCODE
 }
 
@@ -66,7 +82,6 @@ Copy-Item $manifestPath -Destination $stageDir -Force
 
 Write-Host "[5/5] Creating final flat latest.zip..." -ForegroundColor Yellow
 $zipPath = "latest.zip"
-# Compress-Archive is natively supported and guarantees a flat zip format
 Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
 
 Remove-Item -Recurse -Force $stageDir

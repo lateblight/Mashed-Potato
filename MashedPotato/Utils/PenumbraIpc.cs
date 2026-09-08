@@ -1,33 +1,45 @@
+using System;
 using Dalamud.Plugin;
 using Penumbra.Api.Enums;
-using Penumbra.Api.Helpers;
 using Penumbra.Api.IpcSubscribers;
-using System;
 
-namespace OopsAllLalafellsSRE.Utils
+namespace MashedPotato.Utils
 {
-    public class PenumbraIpc(IDalamudPluginInterface pluginInterface) : IDisposable
+    public sealed class PenumbraIpc : IDisposable
     {
-        private readonly RedrawAll redrawAll = new(pluginInterface);
-        private readonly EventSubscriber<nint, Guid, nint, nint, nint> creatingCharacterBaseEvent =
-            CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
+        private readonly IDalamudPluginInterface pi;
+        private readonly RedrawAll? redrawAllSub;
 
-        public void Dispose()
+        public PenumbraIpc(IDalamudPluginInterface pluginInterface)
         {
-            creatingCharacterBaseEvent.Dispose();
-        }
+            this.pi = pluginInterface;
 
-        internal void RedrawAll(RedrawType setting)
-        {
             try
             {
-                redrawAll.Invoke(setting);
+                this.redrawAllSub = new RedrawAll(pluginInterface);
             }
             catch (Exception ex)
             {
-                Plugin.OutputChatLine($"Warning: Penumbra not found. Error: {ex.Message}\n" +
-                                      "Note: if you disable Penumbra before this plugin, lalafells will stay there until updated.");
+                Plugin.OutputChatLine($"Failed to initialize Penumbra IPC: {ex.Message}");
             }
+        }
+
+        public void RedrawAll(RedrawType type)
+        {
+            try
+            {
+                this.redrawAllSub?.Invoke(type);
+            }
+            catch (Exception ex)
+            {
+                // Fixed logging call to use standard Dalamud plugin log framework
+                Service.PluginLog.Error($"Error triggering Penumbra RedrawAll: {ex}");
+            }
+        }
+
+        public void Dispose()
+        {
+            // Cleanup handled by subscriber wrapper
         }
     }
 }

@@ -1,36 +1,39 @@
-using System;
-using System.Collections.Generic;
+// Mashed-Potato/MashedPotato/Configuration.cs
+
 using Dalamud.Configuration;
 using Dalamud.Plugin;
-using OopsAllLalafellsSRE.Utils;
+using System;
+using System.Collections.Generic;
 
-namespace MashedPotato;
-
-[Serializable]
-public class Configuration : IPluginConfiguration
+namespace MashedPotato
 {
-    public int Version { get; set; } = 1;
-
-    // Core plugin toggles
-    public bool enabled { get; set; } = true;
-    public bool stayOn { get; set; } = true;
-    public bool nameHQ { get; set; } = true;
-    public Constant.Race SelectedRace { get; set; } = Constant.Race.HYUR;
-
-    // A collection of trusted player names that bypass any character transformations.
-    // Initialised with case-insensitive handling to prevent duplicate confusion.
-    public HashSet<string> WhitelistedPlayers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-
-    [NonSerialized]
-    private IDalamudPluginInterface? pluginInterface;
-
-    public void Initialize(IDalamudPluginInterface dalPluginInterface)
+    [Serializable]
+    public class Configuration : IPluginConfiguration
     {
-        this.pluginInterface = dalPluginInterface;
-    }
+        public int Version { get; set; } = 1;
 
-    public void Save()
-    {
-        this.pluginInterface!.SavePluginConfig(this);
+        // Chuck your whitelisted mates in here so they don't get mashed
+        public HashSet<string> WhitelistedPlayers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        // The target race we are morphing the Lalafells into
+        public int SelectedRace { get; set; } = 0;
+        
+        public bool enabled { get; set; } = true;
+        public bool stayOn { get; set; } = false;
+        
+        // Toggle for the cheeky indicator icon on the nameplate
+        public bool nameHQ { get; set; } = true;
+
+        [NonSerialized] private IDalamudPluginInterface? pluginInterface;
+
+        public void Initialize(IDalamudPluginInterface pluginInterface)
+        {
+            this.pluginInterface = pluginInterface;
+        }
+
+        public void Save()
+        {
+            this.pluginInterface!.SavePluginConfig(this);
+        }
     }
 }

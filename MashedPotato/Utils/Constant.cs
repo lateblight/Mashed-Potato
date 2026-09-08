@@ -2,7 +2,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace OopsAllLalafellsSRE.Utils
+namespace MashedPotato.Utils
 {
     public static class Constant
     {
@@ -45,3 +45,4 @@ namespace OopsAllLalafellsSRE.Utils
         }
     }
 }
+

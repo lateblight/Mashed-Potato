@@ -1,4 +1,5 @@
 # Mashed Potato
+[![Automated Build](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
 A Dalamud plugin for FFXIV that swaps Lalafell character models into a different race of your choice directly on your screen.
 

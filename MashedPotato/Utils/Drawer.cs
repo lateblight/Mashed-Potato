@@ -1,12 +1,13 @@
+// MashedPotato/Utils/Drawer.cs
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using static OopsAllLalafellsSRE.Utils.Constant;
+using static MashedPotato.Utils.Constant;
 using MashedPotato;
 
-namespace OopsAllLalafellsSRE.Utils
+namespace MashedPotato.Utils
 {
     internal class Drawer : IDisposable
     {
@@ -34,13 +35,13 @@ namespace OopsAllLalafellsSRE.Utils
         {
             if (!Service.configuration.enabled) return;
 
-            // Return if not a player character
+            // Bail out early if they aren't a proper player character
             var gameObj = (GameObject*)gameObjectAddress;
             if (gameObj->ObjectKind != ObjectKind.Pc) return;
 
             var playerName = gameObj->NameString;
 
-            // WHITELIST CHECK: If the player is on your whitelist, ignore them and keep them as a Lalafell
+            // WHITELIST CHECK: If your mate is on the list, leave their Lalafell model alone
             if (!string.IsNullOrEmpty(playerName) && Service.configuration.WhitelistedPlayers.Contains(playerName))
                 return;
 
@@ -57,9 +58,11 @@ namespace OopsAllLalafellsSRE.Utils
             if ((int)Service.configuration.SelectedRace == 3 || customData.Race == Race.UNKNOWN)
                 return;
 
-            // If they made it past the checks above, they are a Lalafell! Change them!
+            // If they made it past the checks above, they are a Lalafell!
             NonNativeID.Add(playerName);
-            ChangeRace(customData, customizePtr, Service.configuration.SelectedRace);
+            
+            // Cast the integer back into a proper Race enum so the compiler stops whinging
+            ChangeRace(customData, customizePtr, (Race)Service.configuration.SelectedRace);
         }
 
         private static unsafe void ChangeRace(CharaCustomizeData customData, nint customizePtr, Race selectedRace)

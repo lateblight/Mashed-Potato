@@ -3,13 +3,11 @@ using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
-using OopsAllLalafellsSRE.Utils;
-using OopsAllLalafellsSRE.Windows;
 using Penumbra.Api.Enums;
-using MashedPotato; 
 using MashedPotato.Utils;
+using MashedPotato.Windows;
 
-namespace OopsAllLalafellsSRE
+namespace MashedPotato
 {
     public sealed class Plugin : IDalamudPlugin
     {
@@ -19,13 +17,11 @@ namespace OopsAllLalafellsSRE
 
         public Plugin(IDalamudPluginInterface pluginInterface)
         {
-            // This line asks Dalamud to populate all the [PluginService] tools in Service.cs
+            Service.pluginInterface = pluginInterface;
             pluginInterface.Create<Service>();
 
-            Service.pluginInterface = pluginInterface;
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
-            // We do a quick check on startup just in case
             if (!Service.configuration.stayOn)
             {
                 Service.configuration.enabled = false;
@@ -37,11 +33,8 @@ namespace OopsAllLalafellsSRE
             Service.configWindow = new ConfigWindow(this);
             WindowSystem.AddWindow(Service.configWindow);
             
-            // Reassured the compiler these won't be null
             Service.drawer = pluginInterface.Create<Drawer>()!;
             Service.nameplate = pluginInterface.Create<Nameplate>()!;
-            
-            // Initialised the right-click whitelist integration
             Service.whitelistManager = new WhitelistManager(Service.configuration, Service.contextMenu, Service.chatGui);
 
             pluginInterface.UiBuilder.Draw += DrawUI;
@@ -53,7 +46,6 @@ namespace OopsAllLalafellsSRE
                 HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
             });
 
-            // EVENT HOOK: Listen for when the player changes areas (loading screens)
             Service.clientState.TerritoryChanged += OnTerritoryChanged;
         }
 
@@ -65,7 +57,6 @@ namespace OopsAllLalafellsSRE
 
         public void Dispose()
         {
-            // Clean up our event hook so it doesn't cause memory leaks when the plugin is disabled
             Service.clientState.TerritoryChanged -= OnTerritoryChanged;
 
             WindowSystem.RemoveAllWindows();
@@ -76,12 +67,7 @@ namespace OopsAllLalafellsSRE
             Service.commandManager?.RemoveHandler(CommandName);
         }
 
-        // ==============================================================================
-        // THE MASTER KEYRING: METHOD OVERLOADING
-        // Dalamud API 15 changed the hidden signature for TerritoryChanged.
-        // By providing all reasonable data combinations below, the C# compiler will 
-        // automatically select the exact fit and route it to our HandleAreaChange logic!
-        // ==============================================================================
+        // Method Overloading for API 15 TerritoryChanged event signatures
         private void OnTerritoryChanged() => HandleAreaChange();
         private void OnTerritoryChanged(ushort a) => HandleAreaChange();
         private void OnTerritoryChanged(uint a) => HandleAreaChange();
@@ -93,23 +79,14 @@ namespace OopsAllLalafellsSRE
         private void OnTerritoryChanged(object? a, uint b) => HandleAreaChange();
         private void OnTerritoryChanged(object? a, int b) => HandleAreaChange();
 
-        // The actual logic that runs when the player passes through a loading screen
         private void HandleAreaChange()
         {
-            // If the player has "Keep Enabled Across Area Changes" turned OFF, and the plugin is currently ON...
             if (!Service.configuration.stayOn && Service.configuration.enabled)
             {
-                // Turn it off!
                 Service.configuration.enabled = false;
                 Service.configuration.Save();
-                
-                // Tell the UI menu to update its checkbox so it matches our new state
                 Service.configWindow.InvokeConfigChanged();
-                
-                // Ask Penumbra to redraw everyone back to their normal, non-Lalafell selves
                 Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
-                
-                // Leave a friendly little note in the chat so the player knows what happened
                 OutputChatLine("You entered a new area. Mashed Potato has automatically turned off.");
             }
         }
