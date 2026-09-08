@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Drawer.cs
+
 // MashedPotato/Utils/Drawer.cs
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;

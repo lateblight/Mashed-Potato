@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Constant.cs
+
 using Dalamud.Game.ClientState.Objects.Enums;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -45,4 +47,5 @@ namespace MashedPotato.Utils
         }
     }
 }
+
 

@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Nameplate.cs
+
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.Gui.NamePlate;
 
@@ -46,3 +48,4 @@ namespace MashedPotato.Utils
         public void Dispose() { }
     }
 }
+

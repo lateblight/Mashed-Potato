@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/WhitelistManager.cs
+
 using System;
 using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Plugin.Services;
@@ -63,3 +65,4 @@ public class WhitelistManager : IDisposable
         this.contextMenu.OnMenuOpened -= OnMenuOpened;
     }
 }
+

@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/PenumbraIpc.cs
+
 using System;
 using Dalamud.Plugin;
 using Penumbra.Api.Enums;
