@@ -2,110 +2,31 @@
 
 name: Automated Build & Release
 
-# Wake up the assembly line whenever we push code to the main branch
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README.md'
-      - '.gitignore'
-      - '.editorconfig'
-
-# Give the bot permission to push commits and publish releases
-permissions:
-  contents: write
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-and-release:
+  build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup .NET 10
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
 
-      # Grab the Dalamud API so the compiler knows what FFXIV looks like
-      - name: Fetch Dalamud API
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Uri "https://goatcorp.github.io/dalamud-distrib/latest.zip" -OutFile "dalamud.zip"
-          Expand-Archive -Force dalamud.zip "$env:APPDATA\XIVLauncher\addon\Hooks\dev\"
+    - name: Run Automated Build Pipeline
+      shell: pwsh
+      run: ./build.ps1
 
-      # Grab the Penumbra zip, unzip it, and dynamically hunt down the DLLs anywhere inside
-      - name: Fetch Penumbra API & Luna
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/xivdev/Penumbra/releases/latest/download/Penumbra.zip" -OutFile "penumbra.zip"
-          Expand-Archive -Force penumbra.zip "penumbra_temp"
-          New-Item -ItemType Directory -Force -Path "MashedPotato/lib"
-          
-          $apiFile = Get-ChildItem -Path "penumbra_temp" -Filter "Penumbra.Api.dll" -Recurse | Select-Object -First 1
-          $lunaFile = Get-ChildItem -Path "penumbra_temp" -Filter "Luna.dll" -Recurse | Select-Object -First 1
-          
-          if ($apiFile) {
-              Copy-Item $apiFile.FullName -Destination "MashedPotato/lib/Penumbra.Api.dll" -Force
-              Write-Host "Found and copied Penumbra.Api.dll successfully!"
-          } else {
-              throw "Could not find Penumbra.Api.dll in the downloaded zip!"
-          }
-          
-          if ($lunaFile) {
-              Copy-Item $lunaFile.FullName -Destination "MashedPotato/lib/Luna.dll" -Force
-              Write-Host "Found and copied Luna.dll successfully!"
-          } else {
-              throw "Could not find Luna.dll in the downloaded zip!"
-          }
-
-      # Tell our manifest to point people to the proper release page, not the raw code
-      - name: Route repo.json to GitHub Releases
-        shell: powershell
-        run: |
-          $repoPath = "repo.json"
-          $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
-          $repoJson[0].DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/releases/latest/download/latest.zip"
-          $repoJson[0].DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/releases/latest/download/latest.zip"
-          ConvertTo-Json -InputObject $repoJson -Depth 10 | Set-Content $repoPath
-          
-      # Fire up our trusty build script
-      - name: Run Local Build Pipeline
-        shell: powershell
-        run: ./build.ps1
-
-      - name: Extract New Version Number
-        id: version
-        shell: powershell
-        run: |
-          $version = (Get-Content MashedPotato/MashedPotato.json -Raw | ConvertFrom-Json).AssemblyVersion
-          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-
-      # Save the bumped version number and updated repo.json back into the repository
-      - name: Commit Version Bump & Manifest Updates
-        shell: bash
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add MashedPotato/MashedPotato.csproj MashedPotato/MashedPotato.json repo.json
-          
-          # The [skip ci] tag stops the bot from triggering an infinite loop of builds
-          git commit -m "chore: automated build and version bump to ${{ steps.version.outputs.VERSION }} [skip ci]" || echo "No changes to commit"
-          git push
-
-      # Box up the compiled latest.zip and serve it to the public
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.VERSION }}
-          name: Mashed Potato v${{ steps.version.outputs.VERSION }}
-          files: latest.zip
-          body: "Automated release of Mashed Potato version ${{ steps.version.outputs.VERSION }}."
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: latest-zip
+        path: latest.zip
