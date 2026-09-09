@@ -1,6 +1,5 @@
 // File: ./MashedPotato/Utils/Service.cs
 
-
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -18,7 +17,6 @@ namespace MashedPotato.Utils
         [PluginService] public static IContextMenu contextMenu { get; set; } = null!;
         [PluginService] public static IPluginLog PluginLog { get; private set; } = null!;
         
-        // Proper API 15 NamePlate service, none of that obsolete IGameGui rubbish!
         [PluginService] public static INamePlateGui namePlateGui { get; private set; } = null!;
 
         public static Configuration configuration { get; set; } = null!;

@@ -1,6 +1,5 @@
-<!-- File: README.md -->
 # Mashed Potato 🥔
-[![Automated Build & Release](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
+[![Automated Build](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
 A lightweight, client-side Dalamud plugin for *Final Fantasy XIV* that politely intercepts character data and swaps Lalafell models into a proper, grown-up race of your choice directly on your screen.
 
@@ -57,4 +56,4 @@ A massive nod of appreciation to the original *OopsAllLalafells* developers who 
 * **Kelvin** (Updates)
 
 ## Search Tags
-FFXIV, Final Fantasy XIV, Dalamud Plugin, Penumbra, Lalafell Model Swap, Race Swap, Visual Filter, FFXIV Modding, OopsAllLalafells, Mashed-Potato, SRE, Lalafells, lala
+FFXIV, Final Fantasy XIV, Dalamud Plugin, Penumbra, Lalafell Model Swap, Race Swap, Visual Filter, FFXIV Modding, OopsAllLalafells, Mashed-Potato, SRE, Lalafells, lalaSSS

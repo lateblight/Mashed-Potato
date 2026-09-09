@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static MashedPotato.Utils.Constant;
-using MashedPotato;
 
 namespace MashedPotato.Utils
 {
@@ -17,17 +16,6 @@ namespace MashedPotato.Utils
         public Drawer()
         {
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
-            
-            // Subscribe to Penumbra's character base creation event safely
-            try
-            {
-                Penumbra.Api.IpcSubscribers.CreatingCharacterBase.Delegate += OnCreatingCharacterBase;
-            }
-            catch (Exception ex)
-            {
-                Plugin.OutputChatLine(s: $"Failed to subscribe to Penumbra CreatingCharacterBase: {ex.Message}");
-            }
-
             if (Service.configuration.enabled)
             {
                 Plugin.OutputChatLine("Mashed-Potato starting...");
@@ -52,13 +40,11 @@ namespace MashedPotato.Utils
 
             var playerName = gameObj->NameString;
 
-            // WHITELIST CHECK: If your mate is on the list, leave their Lalafell model alone
             if (!string.IsNullOrEmpty(playerName) && Service.configuration.WhitelistedPlayers.Contains(playerName))
                 return;
 
             var customData = Marshal.PtrToStructure<CharaCustomizeData>(customizePtr);
             
-            // 3 is the internal game ID for Lalafells
             if ((int)customData.Race != 3)
                 return;
 
@@ -82,21 +68,6 @@ namespace MashedPotato.Utils
         public void Dispose()
         {
             Service.configWindow.OnConfigChanged -= RefreshAllPlayers;
-            try
-            {
-                Penumbra.Api.IpcSubscribers.CreatingCharacterBase.Delegate -= OnCreatingCharacterBase;
-            }
-            catch { }
         }
     }
 }
-```[cite: 1]
-
----
-
-### How to Build and Push
-
-Pop open your terminal in the repository root and run your automated build script to compile everything, bump the version, and bundle a fresh `latest.zip`[cite: 1]:
-
-```powershell
-./build.ps1

@@ -11,6 +11,9 @@ namespace MashedPotato.Utils
     {
         private readonly IDalamudPluginInterface pi;
         private readonly RedrawAll? redrawAllSub;
+        
+        // Fix: Store the active subscription as a generic IDisposable
+        private readonly IDisposable? creatingCharaSub;
 
         public PenumbraIpc(IDalamudPluginInterface pluginInterface)
         {
@@ -19,6 +22,9 @@ namespace MashedPotato.Utils
             try
             {
                 this.redrawAllSub = new RedrawAll(pluginInterface);
+                
+                // Fix: Call the static Subscriber method and save the resulting subscription
+                this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
             }
             catch (Exception ex)
             {
@@ -34,14 +40,13 @@ namespace MashedPotato.Utils
             }
             catch (Exception ex)
             {
-                // Fixed logging call to use standard Dalamud plugin log framework
                 Service.PluginLog.Error($"Error triggering Penumbra RedrawAll: {ex}");
             }
         }
 
         public void Dispose()
         {
-            // Cleanup handled by subscriber wrapper
+            this.creatingCharaSub?.Dispose();
         }
     }
 }
