@@ -1,4 +1,4 @@
-# File: build.ps1
+# File: ./build.ps1
 
 <#
 .SYNOPSIS
@@ -82,10 +82,11 @@ Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
 $stageDir = "MashedPotato/stage"
 if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
 if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Path $stageDir | Out-Null
 
 Write-Host "[4/6] Compiling .NET 10 project from solution root..." -ForegroundColor Yellow
 dotnet restore Mashed-Potato.sln
-dotnet publish MashedPotato/MashedPotato.csproj -c Release -o "MashedPotato/stage"
+dotnet publish MashedPotato/MashedPotato.csproj -c Release -o $stageDir
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "[Error] Compilation failed."
@@ -93,12 +94,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "[5/6] Injecting JSON manifest into package..." -ForegroundColor Yellow
-Copy-Item $manifestPath -Destination $stageDir -Force
+Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
-Write-Host "[6/6] Creating final flat latest.zip..." -ForegroundColor Yellow
-$zipPath = "latest.zip"
-Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
-
+Write-Host "[6/6] Creating flat latest.zip archive..." -ForegroundColor Yellow
+Compress-Archive -Path "$stageDir\*" -DestinationPath "latest.zip" -Force
 Remove-Item -Recurse -Force $stageDir
 
 Write-Host "==================================================" -ForegroundColor Cyan
