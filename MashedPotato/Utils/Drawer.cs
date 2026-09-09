@@ -1,6 +1,5 @@
 // File: ./MashedPotato/Utils/Drawer.cs
 
-// MashedPotato/Utils/Drawer.cs
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
@@ -18,6 +17,17 @@ namespace MashedPotato.Utils
         public Drawer()
         {
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
+            
+            // Subscribe to Penumbra's character base creation event safely
+            try
+            {
+                Penumbra.Api.IpcSubscribers.CreatingCharacterBase.Delegate += OnCreatingCharacterBase;
+            }
+            catch (Exception ex)
+            {
+                Plugin.OutputChatLine(s: $"Failed to subscribe to Penumbra CreatingCharacterBase: {ex.Message}");
+            }
+
             if (Service.configuration.enabled)
             {
                 Plugin.OutputChatLine("Mashed-Potato starting...");
@@ -37,7 +47,6 @@ namespace MashedPotato.Utils
         {
             if (!Service.configuration.enabled) return;
 
-            // Bail out early if they aren't a proper player character
             var gameObj = (GameObject*)gameObjectAddress;
             if (gameObj->ObjectKind != ObjectKind.Pc) return;
 
@@ -49,21 +58,14 @@ namespace MashedPotato.Utils
 
             var customData = Marshal.PtrToStructure<CharaCustomizeData>(customizePtr);
             
-            // 3 is the internal game ID for Lalafells. 
-            // If the character loading in is NOT a 3, we stop the code here and let them stay normal.
+            // 3 is the internal game ID for Lalafells
             if ((int)customData.Race != 3)
                 return;
 
-            // FAILSAFE: 
-            // If they ARE a Lalafell, but you accidentally selected Lalafell in the plugin menu 
-            // as the race you want to change them into, we stop here so the game doesn't do unnecessary work.
             if ((int)Service.configuration.SelectedRace == 3 || customData.Race == Race.UNKNOWN)
                 return;
 
-            // If they made it past the checks above, they are a Lalafell!
             NonNativeID.Add(playerName);
-            
-            // Cast the integer back into a proper Race enum so the compiler stops whinging
             ChangeRace(customData, customizePtr, (Race)Service.configuration.SelectedRace);
         }
 
@@ -80,6 +82,21 @@ namespace MashedPotato.Utils
         public void Dispose()
         {
             Service.configWindow.OnConfigChanged -= RefreshAllPlayers;
+            try
+            {
+                Penumbra.Api.IpcSubscribers.CreatingCharacterBase.Delegate -= OnCreatingCharacterBase;
+            }
+            catch { }
         }
     }
 }
+```[cite: 1]
+
+---
+
+### How to Build and Push
+
+Pop open your terminal in the repository root and run your automated build script to compile everything, bump the version, and bundle a fresh `latest.zip`[cite: 1]:
+
+```powershell
+./build.ps1
