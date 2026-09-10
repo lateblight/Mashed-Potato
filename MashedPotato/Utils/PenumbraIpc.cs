@@ -20,7 +20,7 @@ namespace MashedPotato.Utils
             try
             {
                 this.redrawAllSub = new RedrawAll(pluginInterface);
-                this.creatingCharaSub = CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
+                this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
             }
             catch (Exception ex)
             {
