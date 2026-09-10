@@ -16,8 +16,7 @@ namespace MashedPotato.Utils
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
             if (Service.configuration.enabled)
             {
-                Service.PluginLog.Information("Mashed-Potato starting...");
-                RefreshAllPlayers();
+                Service.PluginLog.Information("Mashed-Potato loaded quietly.");
             }
         }
 

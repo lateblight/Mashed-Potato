@@ -3,7 +3,7 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host " [Mashed Potato] Starting Clean Build Pipeline" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-$newVersion = "1.2.0.30"
+$newVersion = "1.2.0.31"
 Write-Host "Forcing Version -> $newVersion" -ForegroundColor Green
 
 $csprojPath = "MashedPotato/MashedPotato.csproj"
@@ -43,9 +43,14 @@ New-Item -ItemType Directory -Path $stageDir | Out-Null
 dotnet restore Mashed-Potato.sln
 dotnet publish MashedPotato/MashedPotato.csproj -c Release -o $stageDir
 
+Write-Host "Scrubbing prohibited core game assemblies from the zip..." -ForegroundColor Yellow
+$prohibited = @("Dalamud*.dll", "Lumina*.dll", "ImGui*.dll", "FFXIVClientStructs*.dll")
+foreach ($pattern in $prohibited) {
+    Get-ChildItem -Path $stageDir -Filter $pattern -ErrorAction SilentlyContinue | Remove-Item -Force
+}
+
 Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
-# BULLETPROOF ZIP PATHING: Lock onto the absolute root directory
 $rootDir = (Get-Location).Path
 $zipDest = Join-Path $rootDir "latest.zip"
 
