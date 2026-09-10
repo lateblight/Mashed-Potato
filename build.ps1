@@ -3,7 +3,7 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host " [Mashed Potato] Starting Clean Build Pipeline" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-$newVersion = "1.2.0.26"
+$newVersion = "1.2.0.30"
 Write-Host "Forcing Version -> $newVersion" -ForegroundColor Green
 
 $csprojPath = "MashedPotato/MashedPotato.csproj"
@@ -46,11 +46,11 @@ dotnet publish MashedPotato/MashedPotato.csproj -c Release -o $stageDir
 Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
 # BULLETPROOF ZIP PATHING: Lock onto the absolute root directory
-$rootPath = (Get-Location).Path
-$zipPath = Join-Path $rootPath "latest.zip"
+$rootDir = (Get-Location).Path
+$zipDest = Join-Path $rootDir "latest.zip"
 
 Push-Location $stageDir
-Compress-Archive -Path "*" -DestinationPath $zipPath -Force
+Compress-Archive -Path "*" -DestinationPath $zipDest -Force
 Pop-Location
 
 Remove-Item -Recurse -Force $stageDir
