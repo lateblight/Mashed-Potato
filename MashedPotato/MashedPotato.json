@@ -3,7 +3,7 @@
   "Name": "Mashed Potato",
   "Punchline": "Transforms Lalafells into other races.",
   "InternalName": "MashedPotato",
-  "AssemblyVersion": "1.2.0.24",
+  "AssemblyVersion": "1.2.0.25",
   "Description": "Mashes all Lalafells into the race of your choice.",
   "ApplicableVersion": "any",
   "DalamudApiLevel": 15,
