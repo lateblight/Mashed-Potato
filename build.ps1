@@ -1,8 +1,8 @@
-# File: ./build.ps1
+# File: build.ps1
 
 <#
 .SYNOPSIS
-    Clean, straightforward Automated Build & Version Bump Pipeline for Mashed-Potato
+    Clean Automated Build & Version Bump Pipeline for Mashed-Potato
 #>
 
 $ErrorActionPreference = "Stop"
@@ -75,7 +75,12 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "[4/4] Creating final flat latest.zip..." -ForegroundColor Yellow
 Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
-Compress-Archive -Path "$stageDir\*" -DestinationPath "latest.zip" -Force
+
+# Critical Fix: Step INSIDE the directory before zipping to ensure a perfectly flat structure
+Push-Location $stageDir
+Compress-Archive -Path "*" -DestinationPath "..\..\latest.zip" -Force
+Pop-Location
+
 Remove-Item -Recurse -Force $stageDir
 
 Write-Host "==================================================" -ForegroundColor Cyan
