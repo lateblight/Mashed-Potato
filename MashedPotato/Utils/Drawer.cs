@@ -1,5 +1,3 @@
-// File: ./MashedPotato/Utils/Drawer.cs
-
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
@@ -11,7 +9,7 @@ namespace MashedPotato.Utils
 {
     internal class Drawer : IDisposable
     {
-        public static HashSet<string> NonNativeID = [];
+        public static HashSet<string> NonNativeID = new HashSet<string>();
 
         public Drawer()
         {
