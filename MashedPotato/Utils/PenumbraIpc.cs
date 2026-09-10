@@ -12,7 +12,7 @@ namespace MashedPotato.Utils
         private readonly IDalamudPluginInterface pi;
         private readonly RedrawAll? redrawAllSub;
         
-        // Use IDisposable because Subscriber is a method returning an unsubscription token
+        // Stored as an IDisposable because Subscriber is a method, not a class type.
         private readonly IDisposable? creatingCharaSub;
 
         public PenumbraIpc(IDalamudPluginInterface pluginInterface)
@@ -22,6 +22,8 @@ namespace MashedPotato.Utils
             try
             {
                 this.redrawAllSub = new RedrawAll(pluginInterface);
+                
+                // Call the static method directly and box the result into our IDisposable field.
                 this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
             }
             catch (Exception ex)
