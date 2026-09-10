@@ -1,3 +1,4 @@
+// File: ./MashedPotato/Utils/Drawer.cs
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
@@ -17,6 +18,7 @@ namespace MashedPotato.Utils
             if (Service.configuration.enabled)
             {
                 Service.PluginLog.Information("Mashed-Potato loaded quietly.");
+                RefreshAllPlayers();
             }
         }
 
