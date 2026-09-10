@@ -76,9 +76,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[4/4] Creating final flat latest.zip..." -ForegroundColor Yellow
 Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
-Push-Location $stageDir
-Compress-Archive -Path "*" -DestinationPath "..\latest.zip" -Force
-Pop-Location
+# Guaranteed flat zip architecture
+Get-ChildItem -Path $stageDir | Compress-Archive -DestinationPath "latest.zip" -Force
 
 Remove-Item -Recurse -Force $stageDir
 
