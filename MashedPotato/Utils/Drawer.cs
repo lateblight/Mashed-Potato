@@ -18,7 +18,6 @@ namespace MashedPotato.Utils
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
             if (Service.configuration.enabled)
             {
-                // Rerouted to silent diagnostic log to prevent boot crashes
                 Service.PluginLog.Information("Mashed-Potato starting...");
                 RefreshAllPlayers();
             }
@@ -28,8 +27,6 @@ namespace MashedPotato.Utils
         {
             Service.PluginLog.Information("Refreshing all players");
             NonNativeID.Clear();
-            
-            // Added safe null-checks (?) to prevent crashes if UI isn't ready
             Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
             Service.namePlateGui?.RequestRedraw();
         }

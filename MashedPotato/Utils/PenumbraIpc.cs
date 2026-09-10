@@ -24,7 +24,6 @@ namespace MashedPotato.Utils
             }
             catch (Exception ex)
             {
-                // Rerouted to silent diagnostic log to prevent boot crashes
                 Service.PluginLog.Error($"Failed to initialize Penumbra IPC: {ex.Message}");
             }
         }

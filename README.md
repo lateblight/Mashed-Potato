@@ -1,3 +1,4 @@
+<!-- File: README.md -->
 # Mashed Potato 🥔
 [![Automated Build](https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/.github/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
@@ -56,4 +57,4 @@ A massive nod of appreciation to the original *OopsAllLalafells* developers who 
 * **Kelvin** (Updates)
 
 ## Search Tags
-FFXIV, Final Fantasy XIV, Dalamud Plugin, Penumbra, Lalafell Model Swap, Race Swap, Visual Filter, FFXIV Modding, OopsAllLalafells, Mashed-Potato, SRE, Lalafells, lalaOk. 
+FFXIV, Final Fantasy XIV, Dalamud Plugin, Penumbra, Lalafell Model Swap, Race Swap, Visual Filter, FFXIV Modding, OopsAllLalafells, Mashed-Potato, SRE, Lalafells, lala
