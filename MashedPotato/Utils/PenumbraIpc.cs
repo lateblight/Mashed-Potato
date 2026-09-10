@@ -11,9 +11,6 @@ namespace MashedPotato.Utils
     {
         private readonly IDalamudPluginInterface pi;
         private readonly RedrawAll? redrawAllSub;
-        
-        // Store as IDisposable because CreatingCharacterBase is a static class,
-        // and Subscriber is a static method that returns the subscription object.
         private readonly IDisposable? creatingCharaSub;
 
         public PenumbraIpc(IDalamudPluginInterface pluginInterface)
@@ -23,12 +20,11 @@ namespace MashedPotato.Utils
             try
             {
                 this.redrawAllSub = new RedrawAll(pluginInterface);
-                
-                // Call the static Subscriber method directly. No 'new' keyword.
                 this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
             }
             catch (Exception ex)
             {
+                // Rerouted to silent diagnostic log to prevent boot crashes
                 Service.PluginLog.Error($"Failed to initialize Penumbra IPC: {ex.Message}");
             }
         }

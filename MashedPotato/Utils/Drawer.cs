@@ -18,17 +18,20 @@ namespace MashedPotato.Utils
             Service.configWindow.OnConfigChanged += RefreshAllPlayers;
             if (Service.configuration.enabled)
             {
-                Plugin.OutputChatLine("Mashed-Potato starting...");
+                // Rerouted to silent diagnostic log to prevent boot crashes
+                Service.PluginLog.Information("Mashed-Potato starting...");
                 RefreshAllPlayers();
             }
         }
 
         private static void RefreshAllPlayers()
         {
-            Plugin.OutputChatLine("Refreshing all players");
+            Service.PluginLog.Information("Refreshing all players");
             NonNativeID.Clear();
-            Service.penumbraApi.RedrawAll(RedrawType.Redraw);
-            Service.namePlateGui.RequestRedraw();
+            
+            // Added safe null-checks (?) to prevent crashes if UI isn't ready
+            Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
+            Service.namePlateGui?.RequestRedraw();
         }
 
         public static unsafe void OnCreatingCharacterBase(nint gameObjectAddress, Guid _1, nint _2, nint customizePtr, nint _3)
