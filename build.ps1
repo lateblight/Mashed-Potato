@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Bulletproof Automated Build, Version Bump, File Header Stamping, & Flat-Zip Pipeline for Mashed-Potato
+    Clean, straightforward Automated Build & Version Bump Pipeline for Mashed-Potato
 #>
 
 $ErrorActionPreference = "Stop"
@@ -11,27 +11,7 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host " [Mashed Potato] Starting Automated Build Pipeline" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-Write-Host "[1/6] Stamping file location headers on source files..." -ForegroundColor Yellow
-$sourceFiles = Get-ChildItem -Recurse -File | Where-Object { 
-    $_.Extension -match '(.cs|.ps1)$' -and $_.FullName -notmatch '\\(bin|obj|lib|\.vs|\.git|tools)\\' 
-}
-
-foreach ($file in $sourceFiles) {
-    $relativePath = (Resolve-Path -Relative $file.FullName).Replace('\', '/')
-    $content = Get-Content $file.FullName -Raw
-    
-    if ([string]::IsNullOrEmpty($content)) { continue }
-
-    $expectedHeader = "// File: $relativePath"
-    if ($file.Extension -eq '.ps1') { $expectedHeader = "# File: $relativePath" }
-
-    if (-not $content.StartsWith($expectedHeader)) {
-        Set-Content -Path $file.FullName -Value "$expectedHeader`n`n$content" -Encoding UTF8
-        Write-Host " -> Stamped header on: $relativePath" -ForegroundColor DarkGray
-    }
-}
-
-Write-Host "[2/6] Auto-incrementing plugin version..." -ForegroundColor Yellow
+Write-Host "[1/4] Auto-incrementing plugin version..." -ForegroundColor Yellow
 $csprojPath = "MashedPotato/MashedPotato.csproj"
 $manifestPath = "MashedPotato/MashedPotato.json"
 $repoPath = "repo.json"
@@ -78,13 +58,13 @@ if (Test-Path $repoPath) {
     ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding UTF8
 }
 
-Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
+Write-Host "[2/4] Preparing staging directories..." -ForegroundColor Yellow
 $stageDir = "MashedPotato/stage"
 if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
 if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" -ErrorAction SilentlyContinue }
 New-Item -ItemType Directory -Path $stageDir | Out-Null
 
-Write-Host "[4/6] Compiling .NET 10 project from solution root..." -ForegroundColor Yellow
+Write-Host "[3/4] Compiling .NET 10 project from solution root..." -ForegroundColor Yellow
 dotnet restore Mashed-Potato.sln
 dotnet publish MashedPotato/MashedPotato.csproj -c Release -o $stageDir
 
@@ -93,10 +73,8 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "[5/6] Injecting JSON manifest into package..." -ForegroundColor Yellow
+Write-Host "[4/4] Creating final flat latest.zip..." -ForegroundColor Yellow
 Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
-
-Write-Host "[6/6] Creating flat latest.zip archive..." -ForegroundColor Yellow
 Compress-Archive -Path "$stageDir\*" -DestinationPath "latest.zip" -Force
 Remove-Item -Recurse -Force $stageDir
 
