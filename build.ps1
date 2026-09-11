@@ -112,3 +112,5 @@ Remove-Item -Recurse -Force $stageDir
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " ✅ Build & Auto-Version Complete ($newVersion Ready)!" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Cyan
+
+# Triggering final v1.3.0.0 production release
