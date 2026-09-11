@@ -7,33 +7,6 @@ on:
       - 'MashedPotato/**/*.cs'
       - 'MashedPotato/**/*.csproj'
       - 'MashedPotato/**/*.json'
+      - 'build.ps1' # <-- This is the new line!
   workflow_dispatch:
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-
-    - name: Execute Build Script
-      shell: pwsh
-      run: ./build.ps1
-
-    - name: Commit and Push Release Artifacts
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add latest.zip repo.json MashedPotato/MashedPotato.json MashedPotato/MashedPotato.csproj
-        git commit -m "chore: automated build and version bump [skip ci]" || echo "No changes to commit"
-        git push
+# ... (leave the rest of the file exactly as it is)
