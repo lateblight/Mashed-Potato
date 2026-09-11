@@ -29,7 +29,10 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Download Dalamud Dependencies
-      uses: goatcorp/setup-dalamud@v3
+      run: |
+        mkdir -p /home/runner/.xlcore/dalamud/Hooks/dev/
+        curl -L -o dalamud.zip https://goatcorp.github.io/dalamud-distrib/latest.zip
+        unzip dalamud.zip -d /home/runner/.xlcore/dalamud/Hooks/dev/
 
     - name: Execute Build Script
       shell: pwsh
