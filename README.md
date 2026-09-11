@@ -1,10 +1,10 @@
 <!-- File: README.md -->
+# MASHED POTATO 🥔
+[![Automated Build](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png" width="128" height="128" alt="Mashed Potato Icon">
 </p>
-
-# MASHED POTATO
-[![Automated Build](https://github.1usercontent.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
 A lightweight, client-side Dalamud plugin for *Final Fantasy XIV* that politely intercepts character data and swaps Lalafell models into a proper, grown-up race of your choice directly on your screen.
 
@@ -15,7 +15,7 @@ Let's be completely honest: the broader modding culture surrounding certain play
 
 **Mashed Potato** was built as a firm boundary for your own screen. It modifies absolute zero on the server side—nobody else can see what you've done, and it gives you zero unfair advantages. It simply catches the character data as it loads onto your machine, filters out the models you'd rather not look at by giving the ankle-biters a sensible altitude adjustment, and lets you get on with your dungeon crawling in peace.
 
-> **Requirement:** You must have [Penumbra](https://github.com/xivdev/Penumbra) installed and active for this to work, as it handles the heavy lifting of the actual model redrawing under the hood[cite: 1, 2].
+> **Requirement:** You must have [Penumbra](https://github.com/xivdev/Penumbra) installed and active for this to work, as it handles the heavy lifting of the actual model redrawing under the hood.
 
 ---
 
@@ -23,7 +23,7 @@ Let's be completely honest: the broader modding culture surrounding certain play
 
 1. Open your Dalamud settings in-game by typing `/xlsettings` in your chat[cite: 1, 2].
 2. Navigate over to the **Experimental** tab[cite: 1, 2].
-3. Paste the following repository link into a blank box under **Custom Plugin Repositories** to add Penumbra[cite: 1]:  
+3. Paste the following repository link into a blank box under **Custom Plugin Repositories** to add Penumbra:  
    `https://raw.githubusercontent.com/xivdev/Penumbra/master/repo.json`
 4. Click the **`+`** button[cite: 1].
 5. In the next blank box down, paste the link for Mashed Potato[cite: 1]:  
