@@ -58,4 +58,3 @@ A massive nod of appreciation to the original *OopsAllLalafells* developers who 
 
 ## Search Tags
 FFXIV, Final Fantasy XIV, Dalamud Plugin, Penumbra, Lalafell Model Swap, Race Swap, Visual Filter, FFXIV Modding, OopsAllLalafells, Mashed-Potato, SRE, Lalafells, lala
-
