@@ -4,7 +4,7 @@
 </div>
 
 # MASHED POTATO
-[![Automated Build](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
+[![Automated Build](https://github.1usercontent.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
 A lightweight, client-side Dalamud plugin for *Final Fantasy XIV* that politely intercepts character data and swaps Lalafell models into a proper, grown-up race of your choice directly on your screen.
 
@@ -13,7 +13,7 @@ A lightweight, client-side Dalamud plugin for *Final Fantasy XIV* that politely 
 ## 🧐 Why This Exists
 Let's be completely honest: the broader modding culture surrounding certain player models in *Final Fantasy XIV* can occasionally cross lines into deeply uncomfortable territory. Between overly revealing custom glamours and the prevalence of illicit, highly disturbing modifications used by others in public spaces, seeing those child-like Lalafell models caught in the middle of it can ruin the immersion—and peace of mind—of normal gameplay. 
 
-**Mashed Potato** was built as a firm boundary for your own screen. It modifies absolute zero on the server side—nobody else can see what you've done, and it gives you zero unfair advantages. It simply catches the character data as it loads onto your machine, filters out the models you'd rather not look at by giving the ankle-biters a sensible altitude adjustment, and lets you get on with your dungeon crawling in peace.
+**Mashed Potato** was built as a firm boundary for your own screen. It modifies absolute zero on the server side—nobody else can see what you've done, and it gives you zero unfair advantages. It simply catches the character data as it loads onto your machine, filters out the models you'd rather not look at by giving the ankle-biters a sensible altitude adjustment, and lets you get on with your dungeon crawling in peace[cite: 1].
 
 > **Requirement:** You must have [Penumbra](https://github.com/xivdev/Penumbra) installed and active for this to work, as it handles the heavy lifting of the actual model redrawing under the hood[cite: 1, 2].
 
