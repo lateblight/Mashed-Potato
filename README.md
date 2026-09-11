@@ -1,7 +1,7 @@
 <!-- File: README.md -->
-<div align="right">
-  <img src="image/icon.png" width="128" height="128" alt="Mashed Potato Icon">
-</div>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png" width="128" height="128" alt="Mashed Potato Icon">
+</p>
 
 # MASHED POTATO
 [![Automated Build](https://github.1usercontent.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
