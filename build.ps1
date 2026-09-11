@@ -75,7 +75,8 @@ if (Test-Path $repoPath) {
             $entry.AssemblyVersion = $newVersion
         }
     }
-    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding `--json` -Encoding UTF8
+    # FIX: Removed the malformed `--json` encoding argument causing the Ubuntu runner to crash
+    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding UTF8
 }
 
 Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
@@ -94,7 +95,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "[5/6] Scrubbing prohibited core game assemblies & injecting manifest..." -ForegroundColor Yellow
-$prohibited = @("Dalamud*.dll", "Lumina*.dll", "FFXIVClientStructs*.dll")
+$prohibited = @("Dalamud*.dll", "Lumina*.dll", "ImGui*.dll", "FFXIVClientStructs*.dll")
 foreach ($pattern in $prohibited) {
     Get-ChildItem -Path $stageDir -Filter $pattern -ErrorAction SilentlyContinue | Remove-Item -Force
 }
