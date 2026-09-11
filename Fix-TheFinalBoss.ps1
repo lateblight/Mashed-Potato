@@ -1,3 +1,5 @@
+# File: ./Fix-TheFinalBoss.ps1
+
 $ErrorActionPreference = "Stop"
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " [Mashed Potato] The Final Boss Fix" -ForegroundColor Cyan

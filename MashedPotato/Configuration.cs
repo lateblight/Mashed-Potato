@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Configuration.cs
+
 // File: MashedPotato/Configuration.cs
 
 using Dalamud.Configuration;

@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Plugin.cs
+
 // File: MashedPotato/Plugin.cs
 using Dalamud.Game.Command;
 using Dalamud.Game.Text;
@@ -112,3 +114,4 @@ namespace MashedPotato
         public static void DrawConfigUI() => Service.configWindow.IsOpen = true;
     }
 }
+

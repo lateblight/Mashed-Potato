@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Service.cs
+
 // File: MashedPotato/Utils/Service.cs
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Plugin;
@@ -26,3 +28,4 @@ namespace MashedPotato.Utils
         internal static WhitelistManager whitelistManager { get; set; } = null!;
     }
 }
+

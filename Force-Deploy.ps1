@@ -1,3 +1,5 @@
+# File: ./Force-Deploy.ps1
+
 $ErrorActionPreference = "Stop"
 
 # Force absolute paths to bypass the Hide-Tools directory confusion

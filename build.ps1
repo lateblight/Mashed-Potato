@@ -1,3 +1,5 @@
+# File: ./build.ps1
+
 # File: build.ps1
 
 <#

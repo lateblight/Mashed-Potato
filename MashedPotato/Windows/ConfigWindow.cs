@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Windows/ConfigWindow.cs
+
 // File: MashedPotato/Windows/ConfigWindow.cs
 
 using System;
