@@ -1,8 +1,6 @@
-// File: ./MashedPotato/Windows/ConfigWindow.cs
-
+// File: MashedPotato/Windows/ConfigWindow.cs
 
 using System;
-using System.Numerics;
 using Dalamud.Interface.Windowing;
 using Dalamud.Interface.Colors;
 using Dalamud.Bindings.ImGui;
@@ -14,7 +12,6 @@ namespace MashedPotato.Windows
     {
         private Configuration configuration;
         
-        // The missing event trigger! Without this, the Drawer throws a wobbly.
         public event Action? OnConfigChanged;
 
         public ConfigWindow(Plugin plugin) : base(
@@ -29,6 +26,16 @@ namespace MashedPotato.Windows
 
         public override void Draw()
         {
+            // Penumbra Status Warning
+            if (!Service.penumbraApi.ApiAvailable)
+            {
+                ImGui.TextColored(ImGuiColors.DalamudRed, "⚠️ WARNING: Penumbra is not connected!");
+                ImGui.TextWrapped("Mashed Potato requires Penumbra to be installed and enabled. The fryer is offline until Penumbra is loaded.");
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+            }
+
             ImGui.TextColored(ImGuiColors.DalamudYellow, "Welcome to Mashed Potato!");
             ImGui.Text("Configure how you want to transform Lalafells below.");
             ImGui.Spacing();
@@ -72,11 +79,9 @@ namespace MashedPotato.Windows
 
             ImGui.Spacing();
             
-            // The missing dropdown for selecting our target race
             var selectedRace = configuration.SelectedRace;
             string[] races = { "Hyur", "Elezen", "Lalafell (Why?)", "Miqo'te", "Roegadyn", "Au Ra", "Hrothgar", "Viera" };
             
-            // Map the dropdown index to the Constant.Race enum offset
             int raceIndex = selectedRace > 0 ? selectedRace - 1 : 0;
             
             if (ImGui.Combo("Target Race", ref raceIndex, races, races.Length))
@@ -102,7 +107,6 @@ namespace MashedPotato.Windows
 
         public void InvokeConfigChanged()
         {
-            // Give a shout to anyone listening (like Drawer.cs) that settings have changed
             OnConfigChanged?.Invoke();
         }
     }

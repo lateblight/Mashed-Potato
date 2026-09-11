@@ -1,10 +1,10 @@
-// File: ./MashedPotato/Plugin.cs
-
+// File: MashedPotato/Plugin.cs
 using Dalamud.Game.Command;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using Penumbra.Api.Enums;
 using MashedPotato.Utils;
 using MashedPotato.Windows;
@@ -17,26 +17,33 @@ namespace MashedPotato
         private const string CommandName = "/mash";
         public WindowSystem WindowSystem { get; } = new("Mashed Potato");
 
-        public Plugin(IDalamudPluginInterface pluginInterface)
+        public Plugin(
+            IDalamudPluginInterface pluginInterface,
+            IClientState clientState,
+            ICommandManager commandManager,
+            IChatGui chatGui,
+            IContextMenu contextMenu,
+            IPluginLog pluginLog,
+            INamePlateGui namePlateGui)
         {
             Service.pluginInterface = pluginInterface;
-            pluginInterface.Create<Service>();
+            Service.clientState = clientState;
+            Service.commandManager = commandManager;
+            Service.chatGui = chatGui;
+            Service.contextMenu = contextMenu;
+            Service.PluginLog = pluginLog;
+            Service.namePlateGui = namePlateGui;
 
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-
-            if (!Service.configuration.stayOn)
-            {
-                Service.configuration.enabled = false;
-            }
-
+            if (!Service.configuration.stayOn) { Service.configuration.enabled = false; }
             Service.configuration.Initialize(pluginInterface);
             Service.plugin = this;
             Service.penumbraApi = new PenumbraIpc(pluginInterface);
             Service.configWindow = new ConfigWindow(this);
             WindowSystem.AddWindow(Service.configWindow);
             
-            Service.drawer = pluginInterface.Create<Drawer>()!;
-            Service.nameplate = pluginInterface.Create<Nameplate>()!;
+            Service.drawer = new Drawer();
+            Service.nameplate = new Nameplate();
             Service.whitelistManager = new WhitelistManager(Service.configuration, Service.contextMenu, Service.chatGui);
 
             pluginInterface.UiBuilder.Draw += DrawUI;
@@ -47,7 +54,6 @@ namespace MashedPotato
             {
                 HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
             });
-
             Service.clientState.TerritoryChanged += OnTerritoryChanged;
         }
 
@@ -60,7 +66,6 @@ namespace MashedPotato
         public void Dispose()
         {
             Service.clientState.TerritoryChanged -= OnTerritoryChanged;
-
             WindowSystem.RemoveAllWindows();
             Service.penumbraApi?.Dispose();
             Service.drawer?.Dispose();
@@ -69,7 +74,6 @@ namespace MashedPotato
             Service.commandManager?.RemoveHandler(CommandName);
         }
 
-        // Method Overloading for API 15 TerritoryChanged event signatures
         private void OnTerritoryChanged() => HandleAreaChange();
         private void OnTerritoryChanged(ushort a) => HandleAreaChange();
         private void OnTerritoryChanged(uint a) => HandleAreaChange();
@@ -95,25 +99,13 @@ namespace MashedPotato
 
         private void OnCommand(string command, string args)
         {
-            if (args == "on")
-            {
-                Service.configuration.enabled = true;
-                Service.configuration.Save();
-                Service.configWindow.InvokeConfigChanged();
-                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
-                return;
-            }
+            if (args == "on") { Service.configuration.enabled = true; }
+            else if (args == "off") { Service.configuration.enabled = false; }
+            else { Service.configWindow.IsOpen = true; return; }
 
-            if (args == "off")
-            {
-                Service.configuration.enabled = false;
-                Service.configuration.Save();
-                Service.configWindow.InvokeConfigChanged();
-                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
-                return;
-            }
-
-            Service.configWindow.IsOpen = true;
+            Service.configuration.Save();
+            Service.configWindow.InvokeConfigChanged();
+            Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
         }
 
         private void DrawUI() => WindowSystem.Draw();

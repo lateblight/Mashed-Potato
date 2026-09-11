@@ -1,16 +1,13 @@
-# Build outputs, staging, and archives
-/MashedPotato/bin/
-/MashedPotato/obj/
-/MashedPotato/stage/
-latest.zip
-ProjectDump_Output.txt
+# Build artifacts
+bin/
+obj/
+stage/
 
-# Local tooling and scripts folder
-/tools/
+# Local utility scripts and logs
+tools/
+ProjectDump*.txt
+*.dmp
+*.log
 
-# Visual Studio / Rider / VS Code workspace user settings
-.vs/
-.vscode/
-*.user
-*.suo
-.cache
+# NuGet
+packages.lock.json

@@ -1,42 +1,52 @@
-# File: ./ProjectDump.ps1
-
 # File: ProjectDump.ps1
 
 <#
 .SYNOPSIS
-    Exports the entire Mashed-Potato codebase into a single, structured text file for easy review.
+    Robustly exports the entire Mashed-Potato codebase (including project files) into a single text file.
 #>
 
 $ErrorActionPreference = "Stop"
 
 $outputFile = "ProjectDump_Output.txt"
-if (Test-Path $outputFile) { Remove-Item $outputFile }
+$rootPath = $PSScriptRoot
+if ([string]::IsNullOrEmpty($rootPath)) { $rootPath = (Get-Location).Path }
+$outputPath = Join-Path $rootPath $outputFile
+
+if (Test-Path $outputPath) { Remove-Item $outputPath -Force }
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [Mashed Potato] Generating Project Code Dump" -ForegroundColor Cyan
+Write-Host " [Mashed Potato] Generating Bulletproof Project Code Dump" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-# Find all relevant code and config files, excluding build artifacts and hidden git folders
-$filesToDump = Get-ChildItem -Recurse -File | Where-Object { 
-    $_.Extension -match '(.cs|.ps1|.json|.md)$' -and 
-    $_.FullName -notmatch '\\(bin|obj|lib|\.vs|\.git|stage|tools)\\' -and
-    $_.Name -ne $outputFile
+# Find all relevant code, project, and config files using normalised forward-slash paths
+$filesToDump = Get-ChildItem -Path $rootPath -Recurse -File | Where-Object { 
+    $normalizedPath = $_.FullName.Replace('\', '/')
+    $extension = $_.Extension.ToLower()
+
+    # Target text-based project extensions including .csproj
+    $isWantedExtension = ($extension -in '.cs', '.ps1', '.json', '.md', '.csproj')
+
+    # Explicitly exclude build directories, hidden folders, and lib folders
+    $isForbidden = $normalizedPath -match '/(bin|obj|lib|\.vs|\.git|stage|tools)/'
+
+    # Do not include the output dump file itself
+    $isNotOutput = ($_.Name -ne $outputFile)
+
+    return $isWantedExtension -and (-not $isForbidden) -and $isNotOutput
 }
 
 foreach ($file in $filesToDump) {
-    $relativePath = (Resolve-Path -Relative $file.FullName).Replace('\', '/')
-    Write-Host "Appending: $relativePath" -ForegroundColor DarkGray
+    $relPath = "./" + $file.FullName.Substring($rootPath.Length).TrimStart('\', '/').Replace('\', '/')
+    Write-Host "Appending: $relPath" -ForegroundColor DarkGray
 
-    # Write a clean separator header for each file
-    "==================================================" | Out-File -FilePath $outputFile -Append -Encoding UTF8
-    "FILE: $relativePath" | Out-File -FilePath $outputFile -Append -Encoding UTF8
-    "==================================================" | Out-File -FilePath $outputFile -Append -Encoding UTF8
-    "" | Out-File -FilePath $outputFile -Append -Encoding UTF8
+    "==================================================" | Out-File -FilePath $outputPath -Append -Encoding UTF8
+    "FILE: $relPath" | Out-File -FilePath $outputPath -Append -Encoding UTF8
+    "==================================================" | Out-File -FilePath $outputPath -Append -Encoding UTF8
+    "" | Out-File -FilePath $outputPath -Append -Encoding UTF8
 
-    # Append the actual file content
-    Get-Content $file.FullName -Raw | Out-File -FilePath $outputFile -Append -Encoding UTF8
-    "" | Out-File -FilePath $outputFile -Append -Encoding UTF8
-    "" | Out-File -FilePath $outputFile -Append -Encoding UTF8
+    Get-Content $file.FullName -Raw | Out-File -FilePath $outputPath -Append -Encoding UTF8
+    "" | Out-File -FilePath $outputPath -Append -Encoding UTF8
+    "" | Out-File -FilePath $outputPath -Append -Encoding UTF8
 }
 
 Write-Host "==================================================" -ForegroundColor Cyan

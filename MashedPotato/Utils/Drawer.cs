@@ -1,16 +1,16 @@
-// File: ./MashedPotato/Utils/Drawer.cs
+// File: MashedPotato/Utils/Drawer.cs
+
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using static MashedPotato.Utils.Constant;
 
 namespace MashedPotato.Utils
 {
     internal class Drawer : IDisposable
     {
-        public static HashSet<string> NonNativeID = new HashSet<string>();
+        public static HashSet<string> NonNativeID = new();
 
         public Drawer()
         {
@@ -22,7 +22,7 @@ namespace MashedPotato.Utils
             }
         }
 
-        private static void RefreshAllPlayers()
+        internal static void RefreshAllPlayers()
         {
             Service.PluginLog.Information("Refreshing all players");
             NonNativeID.Clear();
@@ -32,36 +32,46 @@ namespace MashedPotato.Utils
 
         public static unsafe void OnCreatingCharacterBase(nint gameObjectAddress, Guid _1, nint _2, nint customizePtr, nint _3)
         {
-            if (!Service.configuration.enabled) return;
+            try
+            {
+                if (!Service.configuration.enabled) return;
 
-            var gameObj = (GameObject*)gameObjectAddress;
-            if (gameObj->ObjectKind != ObjectKind.Pc) return;
+                if (gameObjectAddress == IntPtr.Zero || customizePtr == IntPtr.Zero) return;
 
-            var playerName = gameObj->NameString;
+                var gameObj = (GameObject*)gameObjectAddress;
+                if (gameObj == null) return;
+                if (gameObj->ObjectKind != ObjectKind.Pc) return;
 
-            if (!string.IsNullOrEmpty(playerName) && Service.configuration.WhitelistedPlayers.Contains(playerName))
-                return;
+                var playerName = gameObj->NameString;
+                if (string.IsNullOrEmpty(playerName)) return;
 
-            var customData = Marshal.PtrToStructure<CharaCustomizeData>(customizePtr);
-            
-            if ((int)customData.Race != 3)
-                return;
+                if (Service.configuration.WhitelistedPlayers.Contains(playerName))
+                    return;
 
-            if ((int)Service.configuration.SelectedRace == 3 || customData.Race == Race.UNKNOWN)
-                return;
+                var customData = (CharaCustomizeData*)customizePtr;
 
-            NonNativeID.Add(playerName);
-            ChangeRace(customData, customizePtr, (Race)Service.configuration.SelectedRace);
+                if ((int)customData->Race != 3)
+                    return;
+
+                if ((int)Service.configuration.SelectedRace == 3 || customData->Race == Race.UNKNOWN)
+                    return;
+
+                NonNativeID.Add(playerName);
+                ChangeRace(customData, (Race)Service.configuration.SelectedRace);
+            }
+            catch (Exception ex)
+            {
+                Service.PluginLog.Error(ex, "Caught exception in OnCreatingCharacterBase hook.");
+            }
         }
 
-        private static unsafe void ChangeRace(CharaCustomizeData customData, nint customizePtr, Race selectedRace)
+        private static unsafe void ChangeRace(CharaCustomizeData* customData, Race selectedRace)
         {
-            customData.Race = selectedRace;
-            customData.Tribe = (byte)(((byte)selectedRace * 2) - (customData.Tribe % 2));
-            customData.FaceType %= 4;
-            customData.ModelType %= 2;
-            customData.HairStyle = (byte)((customData.HairStyle % RaceMappings.RaceHairs[selectedRace]) + 1);
-            Marshal.StructureToPtr(customData, customizePtr, true);
+            customData->Race = selectedRace;
+            customData->Tribe = (byte)(((byte)selectedRace * 2) - (customData->Tribe % 2));
+            customData->FaceType %= 4;
+            customData->ModelType %= 2;
+            customData->HairStyle = (byte)((customData->HairStyle % RaceMappings.RaceHairs[selectedRace]) + 1);
         }
 
         public void Dispose()

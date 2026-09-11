@@ -1,5 +1,3 @@
-# File: ./build.ps1
-
 # File: build.ps1
 
 <#
@@ -77,7 +75,7 @@ if (Test-Path $repoPath) {
             $entry.AssemblyVersion = $newVersion
         }
     }
-    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding UTF8
+    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding `--json` -Encoding UTF8
 }
 
 Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
@@ -95,14 +93,12 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "[5/6] Injecting JSON manifest into package..." -ForegroundColor Yellow
-Copy-Item $manifestPath -Destination $stageDir -Force
-
-Write-Host "Scrubbing prohibited core game assemblies from the zip..." -ForegroundColor Yellow
-$prohibited = @("Dalamud*.dll", "Lumina*.dll", "ImGui*.dll", "FFXIVClientStructs*.dll")
+Write-Host "[5/6] Scrubbing prohibited core game assemblies & injecting manifest..." -ForegroundColor Yellow
+$prohibited = @("Dalamud*.dll", "Lumina*.dll", "FFXIVClientStructs*.dll")
 foreach ($pattern in $prohibited) {
     Get-ChildItem -Path $stageDir -Filter $pattern -ErrorAction SilentlyContinue | Remove-Item -Force
 }
+Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
 Write-Host "[6/6] Creating final flat latest.zip..." -ForegroundColor Yellow
 $zipPath = "latest.zip"
