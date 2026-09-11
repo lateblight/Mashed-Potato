@@ -1,9 +1,9 @@
 <!-- File: README.md -->
-# Mashed Potato 🥔
-<p align="center">
+<div align="right">
   <img src="image/icon.png" width="128" height="128" alt="Mashed Potato Icon">
-</p>
+</div>
 
+# MASHED POTATO
 [![Automated Build](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml/badge.svg)](https://github.com/Lateblight/Mashed-Potato/actions/workflows/build.yml)
 
 A lightweight, client-side Dalamud plugin for *Final Fantasy XIV* that politely intercepts character data and swaps Lalafell models into a proper, grown-up race of your choice directly on your screen.
