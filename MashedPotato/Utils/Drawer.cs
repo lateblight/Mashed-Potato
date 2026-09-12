@@ -1,7 +1,5 @@
 // File: ./MashedPotato/Utils/Drawer.cs
 
-// File: MashedPotato/Utils/Drawer.cs
-
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.Api.Enums;
 using System;
@@ -29,6 +27,40 @@ namespace MashedPotato.Utils
             Service.PluginLog.Information("Refreshing all players");
             NonNativeID.Clear();
             Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
+            Service.namePlateGui?.RequestRedraw();
+        }
+
+        internal static void RefreshPlayer(string playerName)
+        {
+            Service.PluginLog.Information($"Refreshing specific player: {playerName}");
+            
+            // Remove only this specific player from the transformed cache
+            NonNativeID.Remove(playerName);
+            
+            // Find the player in the object table to get their integer index for Penumbra
+            int targetIndex = -1;
+            foreach (var obj in Service.objectTable)
+            {
+                if (obj != null && obj.Name.TextValue == playerName)
+                {
+                    targetIndex = (int)obj.ObjectIndex;
+                    break;
+                }
+            }
+            
+            if (targetIndex != -1)
+            {
+                // Tell Penumbra to redraw just them using their integer index
+                Service.penumbraApi?.RedrawPlayer(targetIndex, RedrawType.Redraw);
+            }
+            else
+            {
+                // Failsafe: if they aren't found, redraw everyone just in case
+                Service.PluginLog.Warning($"Could not find index for {playerName}, falling back to RedrawAll.");
+                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
+            }
+            
+            // Nudge the nameplates to update the sneaky icon status
             Service.namePlateGui?.RequestRedraw();
         }
 

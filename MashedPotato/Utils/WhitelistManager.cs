@@ -12,6 +12,9 @@ public class WhitelistManager : IDisposable
     private readonly IContextMenu contextMenu;
     private readonly IChatGui chatGui;
 
+    // Fired whenever the whitelist is modified, passing the player's name for a targeted redraw
+    public event Action<string>? OnWhitelistChanged;
+
     public WhitelistManager(Configuration configuration, IContextMenu contextMenu, IChatGui chatGui)
     {
         this.configuration = configuration;
@@ -58,6 +61,9 @@ public class WhitelistManager : IDisposable
         }
 
         configuration.Save();
+
+        // Broadcast the specific player's name so the plugin triggers an immediate character refresh!
+        OnWhitelistChanged?.Invoke(playerName);
     }
 
     public void Dispose()
@@ -65,4 +71,3 @@ public class WhitelistManager : IDisposable
         this.contextMenu.OnMenuOpened -= OnMenuOpened;
     }
 }
-

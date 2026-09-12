@@ -1,6 +1,5 @@
 // File: ./MashedPotato/Plugin.cs
 
-// File: MashedPotato/Plugin.cs
 using Dalamud.Game.Command;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
@@ -26,7 +25,8 @@ namespace MashedPotato
             IChatGui chatGui,
             IContextMenu contextMenu,
             IPluginLog pluginLog,
-            INamePlateGui namePlateGui)
+            INamePlateGui namePlateGui,
+            IObjectTable objectTable) // Injecting the object table here
         {
             Service.pluginInterface = pluginInterface;
             Service.clientState = clientState;
@@ -35,6 +35,9 @@ namespace MashedPotato
             Service.contextMenu = contextMenu;
             Service.PluginLog = pluginLog;
             Service.namePlateGui = namePlateGui;
+            
+            // Storing the object table in our Service directory
+            Service.objectTable = objectTable;
 
             Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             if (!Service.configuration.stayOn) { Service.configuration.enabled = false; }
@@ -48,6 +51,9 @@ namespace MashedPotato
             Service.nameplate = new Nameplate();
             Service.whitelistManager = new WhitelistManager(Service.configuration, Service.contextMenu, Service.chatGui);
 
+            // Subscribe to the whitelist changed event with the specific player name
+            Service.whitelistManager.OnWhitelistChanged += HandleWhitelistChanged;
+
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
             pluginInterface.UiBuilder.OpenMainUi += DrawConfigUI;
@@ -57,6 +63,14 @@ namespace MashedPotato
                 HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
             });
             Service.clientState.TerritoryChanged += OnTerritoryChanged;
+        }
+
+        private void HandleWhitelistChanged(string playerName)
+        {
+            if (!Service.configuration.enabled) return;
+            
+            // Pass the specific name to Drawer so it only refreshes the target!
+            Drawer.RefreshPlayer(playerName);
         }
 
         public static void OutputChatLine(SeString message)
@@ -72,7 +86,13 @@ namespace MashedPotato
             Service.penumbraApi?.Dispose();
             Service.drawer?.Dispose();
             Service.nameplate?.Dispose();
-            Service.whitelistManager?.Dispose();
+            
+            if (Service.whitelistManager != null)
+            {
+                Service.whitelistManager.OnWhitelistChanged -= HandleWhitelistChanged;
+                Service.whitelistManager.Dispose();
+            }
+
             Service.commandManager?.RemoveHandler(CommandName);
         }
 
@@ -114,4 +134,3 @@ namespace MashedPotato
         public static void DrawConfigUI() => Service.configWindow.IsOpen = true;
     }
 }
-

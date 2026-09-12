@@ -1,6 +1,5 @@
 // File: ./MashedPotato/Utils/Service.cs
 
-// File: MashedPotato/Utils/Service.cs
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
@@ -17,6 +16,9 @@ namespace MashedPotato.Utils
         public static IContextMenu contextMenu { get; set; } = null!;
         public static IPluginLog PluginLog { get; set; } = null!;
         public static INamePlateGui namePlateGui { get; set; } = null!;
+        
+        // Added the Object Table so we can look up specific characters by name
+        public static IObjectTable objectTable { get; set; } = null!;
 
         public static Configuration configuration { get; set; } = null!;
         public static Plugin plugin { get; set; } = null!;
@@ -28,4 +30,3 @@ namespace MashedPotato.Utils
         internal static WhitelistManager whitelistManager { get; set; } = null!;
     }
 }
-

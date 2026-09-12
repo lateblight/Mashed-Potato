@@ -1,7 +1,5 @@
 // File: ./MashedPotato/Utils/PenumbraIpc.cs
 
-// File: MashedPotato/Utils/PenumbraIpc.cs
-
 using System;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc.Exceptions;
@@ -14,6 +12,7 @@ namespace MashedPotato.Utils
     {
         private readonly IDalamudPluginInterface pi;
         private readonly RedrawAll? redrawAllSub;
+        private readonly RedrawObject? redrawObjectSub;
         private readonly IDisposable? creatingCharaSub;
         private readonly IDisposable? initializedSub;
         private readonly IDisposable? disposedSub;
@@ -28,6 +27,8 @@ namespace MashedPotato.Utils
             try
             {
                 this.redrawAllSub = new RedrawAll(pluginInterface);
+                // The correct Penumbra class for targeted redraws
+                this.redrawObjectSub = new RedrawObject(pluginInterface);
                 this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
 
                 this.initializedSub = (IDisposable)Initialized.Subscriber(pluginInterface, OnPenumbraInitialized);
@@ -70,6 +71,21 @@ namespace MashedPotato.Utils
             catch (Exception ex)
             {
                 Service.PluginLog.Error($"Error triggering Penumbra RedrawAll: {ex}");
+            }
+        }
+
+        // Target refresh now takes an integer (the game object index)
+        public void RedrawPlayer(int objectIndex, RedrawType type)
+        {
+            if (!this.ApiAvailable) return;
+
+            try 
+            { 
+                this.redrawObjectSub?.Invoke(objectIndex, type); 
+            }
+            catch (Exception ex) 
+            { 
+                Service.PluginLog.Error($"Error triggering targeted Penumbra Redraw for index {objectIndex}: {ex}"); 
             }
         }
 
