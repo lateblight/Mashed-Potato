@@ -27,7 +27,7 @@ $LibDir = Join-Path $RootPath "lib"
 
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " 🥔 Initialising Mashed Potato Build Sequence..." -ForegroundColor Cyan
-Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host "==================================================s" -ForegroundColor Cyan
 
 # 1. Ensure local lib directory exists for offline assembly security
 if (!(Test-Path $LibDir)) {
@@ -35,7 +35,7 @@ if (!(Test-Path $LibDir)) {
     New-Item -ItemType Directory -Path $LibDir | Out-Null
 }
 
-# 2. Parse and Auto-Increment Version across manifests
+# 2. Parse and Auto-Increment Version across manifests safely
 Write-Host "[2/6] Parsing and bumping project version..." -ForegroundColor Yellow
 if (!(Test-Path $CsprojPath)) {
     throw "Could not locate project file at: $CsprojPath"
@@ -56,7 +56,7 @@ $patch++
 $verParts[-1] = $patch.ToString()
 $newVersion = [string]::Join('.', $verParts)
 
-# Explicitly set version properties
+# Explicitly set version properties in .csproj without touching other tags
 $propertyGroup.Version = $newVersion
 if ($propertyGroup.AssemblyVersion) { 
     $propertyGroup.AssemblyVersion = $newVersion 
@@ -71,30 +71,34 @@ if ($propertyGroup.FileVersion) {
 
 $csproj.Save($CsprojPath)
 
-# Update Plugin JSON
+# Update Plugin JSON (MashedPotato.json) preserving all other properties (Author, Tags, Description)
 if (Test-Path $JsonPath) {
     $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
     $pluginJson.AssemblyVersion = $newVersion
     $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath
 }
 
-# Update Repo JSON safely
+# Update Repo JSON (repo.json) preserving author arrays, tags, and description fields
 if (Test-Path $RepoJsonPath) {
     $repoJson = Get-Content $RepoJsonPath -Raw | ConvertFrom-Json
     for ($i = 0; $i -lt $repoJson.Count; $i++) {
         if ($repoJson[$i].InternalName -eq $ProjectName) {
             $repoJson[$i].AssemblyVersion = $newVersion
-            if ($repoJson[$i].PSObject.Properties['DownloadLink']) {
-                $repoJson[$i].DownloadLink = "https://github.com/lateblight/Mashed-Potato/raw/main/latest.zip"
-            } elseif ($repoJson[$i].PSObject.Properties['Url']) {
-                $repoJson[$i].Url = "https://github.com/lateblight/Mashed-Potato/raw/main/latest.zip"
+            if ($repoJson[$i].PSObject.Properties['DownloadLinkInstall']) {
+                $repoJson[$i].DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            }
+            if ($repoJson[$i].PSObject.Properties['DownloadLinkUpdate']) {
+                $repoJson[$i].DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            }
+            if ($repoJson[$i].PSObject.Properties['DownloadLinkTesting']) {
+                $repoJson[$i].DownloadLinkTesting = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
             }
         }
     }
     $repoJson | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
 }
 
-Write-Host "✨ Bumping Version -> $newVersion" -ForegroundColor Green
+Write-Host "✨ Bumping Version -> $newVersion (Manifests protected & updated)" -ForegroundColor Green
 
 # 3. Prepare Staging Directories
 Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
