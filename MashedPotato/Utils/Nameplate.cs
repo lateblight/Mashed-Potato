@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Nameplate.cs
+
 // File: MashedPotato/Utils/Nameplate.cs
 
 using System;
@@ -33,7 +35,9 @@ namespace MashedPotato.Utils
 
         private unsafe void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
         {
-            if (!Service.configuration.enabled || !Service.configuration.nameHQ) return;
+            // Cache the configuration locally so the compiler's null-state analysis is fully satisfied
+            var config = Service.configuration;
+            if (config == null || !config.enabled || !config.nameHQ) return;
 
             foreach (var handler in handlers)
             {
@@ -42,7 +46,6 @@ namespace MashedPotato.Utils
                     var obj = handler.GameObject;
                     if (obj != null && obj.Address != IntPtr.Zero)
                     {
-                        // Check unmanaged GameObject ObjectKind directly against ObjectKind.Pc
                         var gameObj = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)obj.Address;
                         if (gameObj->ObjectKind != ObjectKind.Pc)
                         {
@@ -57,14 +60,12 @@ namespace MashedPotato.Utils
 
                         if (Service.whitelistManager != null && Service.whitelistManager.IsWhitelisted(playerName))
                         {
-                            continue; // Leave our trusted whitelisted ankle-biters alone
+                            continue; 
                         }
 
-                        // Cast native object address directly to an unmanaged Character pointer
                         var character = (Character*)obj.Address;
                         if (character != null)
                         {
-                            // Inspect customize data array via byte pointer arithmetic (Index 0 = Race ID 3 / Lalafell)
                             byte* customizePtr = (byte*)(&character->DrawData.CustomizeData);
                             if (customizePtr != null && customizePtr[0] == 3)
                             {

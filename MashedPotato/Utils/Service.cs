@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Utils/Service.cs
+
 // File: MashedPotato/Utils/Service.cs
 
 using Dalamud.Plugin;
@@ -8,21 +10,24 @@ namespace MashedPotato.Utils
 {
     public static class Service
     {
-        public static IDalamudPluginInterface pluginInterface { get; set; } = null!;
-        public static IClientState clientState { get; set; } = null!;
-        public static ICommandManager commandManager { get; set; } = null!;
-        public static IChatGui chatGui { get; set; } = null!;
-        public static IContextMenu contextMenu { get; set; } = null!;
-        public static IPluginLog PluginLog { get; set; } = null!;
-        public static INamePlateGui namePlateGui { get; set; } = null!;
-        public static IObjectTable objectTable { get; set; } = null!;
+        public static IDalamudPluginInterface? pluginInterface { get; set; }
+        public static IClientState? clientState { get; set; }
+        public static ICommandManager? commandManager { get; set; }
+        public static IChatGui? chatGui { get; set; }
+        public static IContextMenu? contextMenu { get; set; }
+        public static IPluginLog? PluginLog { get; set; }
+        public static INamePlateGui? namePlateGui { get; set; }
+        public static IObjectTable? objectTable { get; set; }
         
-        public static Configuration configuration { get; set; } = null!;
-        public static Plugin plugin { get; set; } = null!;
-        public static PenumbraIpc penumbraApi { get; set; } = null!;
-        public static ConfigWindow configWindow { get; set; } = null!;
-        public static Drawer drawer { get; set; } = null!;
-        public static Nameplate nameplate { get; set; } = null!;
-        public static WhitelistManager whitelistManager { get; set; } = null!;
+        // Added Framework property to resolve the missing definition compiler error
+        public static IFramework? framework { get; set; }
+
+        public static Plugin? plugin { get; set; }
+        public static Configuration? configuration { get; set; }
+        public static PenumbraIpc? penumbraApi { get; set; }
+        public static WhitelistManager? whitelistManager { get; set; }
+        public static Nameplate? nameplate { get; set; }
+        public static Drawer? drawer { get; set; }
+        public static ConfigWindow? configWindow { get; set; }
     }
 }

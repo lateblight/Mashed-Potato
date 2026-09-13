@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Configuration.cs
+
 // File: MashedPotato/Configuration.cs
 
 using Dalamud.Configuration;
@@ -14,6 +16,7 @@ namespace MashedPotato
         public bool enabled = true;
         public bool zoneChange = true;
         public bool nameHQ = true;
+        public int targetRaceId = 4; // Default to Miqo'te (ID 4)
         public List<string> WhitelistedPlayers { get; set; } = new();
 
         [NonSerialized]

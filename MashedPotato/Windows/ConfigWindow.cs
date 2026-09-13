@@ -1,3 +1,5 @@
+// File: ./MashedPotato/Windows/ConfigWindow.cs
+
 // File: MashedPotato/Windows/ConfigWindow.cs
 
 using System;
@@ -14,12 +16,15 @@ namespace MashedPotato.Windows
         private readonly Configuration configuration;
         private string inputPlayerName = string.Empty;
 
+        private readonly string[] availableRaces = { "Hyur", "Elezen", "Miqo'te", "Roegadyn", "Au Ra", "Hrothgar", "Viera" };
+        private readonly int[] raceIds = { 1, 2, 4, 5, 6, 7, 8 };
+
         public ConfigWindow(Plugin plugin, Configuration configuration) : base("Mashed Potato Configuration")
         {
             this.plugin = plugin;
             this.configuration = configuration;
             
-            Size = new Vector2(520, 400);
+            Size = new Vector2(520, 420);
             SizeCondition = ImGuiCond.FirstUseEver;
         }
 
@@ -48,6 +53,7 @@ namespace MashedPotato.Windows
                     {
                         configuration.enabled = enabled;
                         configuration.Save();
+                        Service.penumbraApi?.RedrawAll();
                     }
 
                     bool zoneChange = configuration.zoneChange;
@@ -68,7 +74,26 @@ namespace MashedPotato.Windows
                     ImGui.Separator();
                     ImGui.Spacing();
 
-                    ImGui.Text("Mashed Potato is brought to you by Lateblight.");
+                    ImGui.Text("Target Race Transformation:");
+                    int currentIdx = Array.IndexOf(raceIds, configuration.targetRaceId);
+                    if (currentIdx < 0) currentIdx = 2;
+
+                    ImGui.SetNextItemWidth(200f);
+                    if (ImGui.Combo("##TargetRaceCombo", ref currentIdx, availableRaces, availableRaces.Length))
+                    {
+                        configuration.targetRaceId = raceIds[currentIdx];
+                        configuration.Save();
+                        Service.penumbraApi?.RedrawAll();
+                    }
+
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+
+                    var pluginVersion = Service.pluginInterface?.Manifest.AssemblyVersion?.ToString() ?? "1.4.0.3";
+                    
+                    // The UI string cleanly incorporates the version alongside the Lateblight attribution[cite: 1]
+                    ImGui.TextDisabled($"Mashed Potato v{pluginVersion} is brought to you by Lateblight.");
                     
                     if (ImGui.Button("GitHub Repo"))
                     {
@@ -84,7 +109,6 @@ namespace MashedPotato.Windows
                     ImGui.TextWrapped("Exempt specific players from model conversion so they appear normally on your screen.");
                     ImGui.Spacing();
 
-                    // Input section inside a neatly padded layout
                     ImGui.Text("Add Player by Exact Name:");
                     ImGui.SetNextItemWidth(320f);
                     ImGui.InputText("##AddPlayerInput", ref inputPlayerName, 64);
