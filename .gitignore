@@ -1,0 +1,30 @@
+# ----------------------------------
+# Mashed Potato: Master Git Ignore
+# ----------------------------------
+
+# 1. Build Artifacts (Keep binaries out of version control)
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+
+# 2. Visual Studio & IDE Rubbish
+.vs/
+.vscode/
+*.user
+*.suo
+
+# 3. Automated Pipeline Packages & Staging
+latest.zip
+MashedPotato/stage/
+MashedPotato/lib/
+
+# 4. Project Dumps & AI Context Files
+*Dump*.txt
+MashedPotato_Project_Dump.txt
+MashedPotato_AI_Context.txt
+
+# 5. Local Tools & Secret Utility Scripts
+tools/
