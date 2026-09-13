@@ -1,99 +1,50 @@
-// File: ./MashedPotato/Utils/PenumbraIpc.cs
+// File: MashedPotato/Utils/PenumbraIpc.cs
 
 using System;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Ipc.Exceptions;
 using Penumbra.Api.Enums;
-using Penumbra.Api.IpcSubscribers;
 
 namespace MashedPotato.Utils
 {
-    public sealed class PenumbraIpc : IDisposable
+    public class PenumbraIpc : IDisposable
     {
-        private readonly IDalamudPluginInterface pi;
-        private readonly RedrawAll? redrawAllSub;
-        private readonly RedrawObject? redrawObjectSub;
-        private readonly IDisposable? creatingCharaSub;
-        private readonly IDisposable? initializedSub;
-        private readonly IDisposable? disposedSub;
-
-        // This flag lets the UI know if Penumbra is actually awake
+        private readonly IDalamudPluginInterface pluginInterface;
         public bool ApiAvailable { get; private set; }
 
         public PenumbraIpc(IDalamudPluginInterface pluginInterface)
         {
-            this.pi = pluginInterface;
-
+            this.pluginInterface = pluginInterface;
             try
             {
-                this.redrawAllSub = new RedrawAll(pluginInterface);
-                // The correct Penumbra class for targeted redraws
-                this.redrawObjectSub = new RedrawObject(pluginInterface);
-                this.creatingCharaSub = (IDisposable)CreatingCharacterBase.Subscriber(pluginInterface, Drawer.OnCreatingCharacterBase);
-
-                this.initializedSub = (IDisposable)Initialized.Subscriber(pluginInterface, OnPenumbraInitialized);
-                this.disposedSub = (IDisposable)Disposed.Subscriber(pluginInterface, OnPenumbraDisposed);
-
-                this.ApiAvailable = true;
+                var subscriber = pluginInterface.GetIpcSubscriber<int>("Penumbra.ApiVersion");
+                var apiVersion = (int?)subscriber?.GetType().GetMethod("Invoke")?.Invoke(subscriber, null) 
+                                 ?? (int?)subscriber?.GetType().GetMethod("InvokeFunc")?.Invoke(subscriber, null) ?? 0;
+                
+                ApiAvailable = apiVersion >= 3;
             }
-            catch (Exception ex)
+            catch
             {
-                this.ApiAvailable = false;
-                Service.PluginLog.Warning($"Penumbra IPC not ready at startup: {ex.Message}");
+                ApiAvailable = false;
             }
-        }
-
-        private void OnPenumbraInitialized()
-        {
-            Service.PluginLog.Information("Penumbra IPC initialized signal received.");
-            this.ApiAvailable = true;
-            Drawer.RefreshAllPlayers();
-        }
-
-        private void OnPenumbraDisposed()
-        {
-            Service.PluginLog.Information("Penumbra IPC disposed signal received.");
-            this.ApiAvailable = false;
         }
 
         public void RedrawAll(RedrawType type)
         {
-            if (!this.ApiAvailable) return;
-
+            if (!ApiAvailable) return;
             try
             {
-                this.redrawAllSub?.Invoke(type);
+                var redrawSub = pluginInterface.GetIpcSubscriber<object>("Penumbra.RedrawAll");
+                redrawSub?.GetType().GetMethod("Invoke")?.Invoke(redrawSub, null);
             }
-            catch (IpcNotReadyError)
+            catch
             {
-                this.ApiAvailable = false;
-            }
-            catch (Exception ex)
-            {
-                Service.PluginLog.Error($"Error triggering Penumbra RedrawAll: {ex}");
-            }
-        }
-
-        // Target refresh now takes an integer (the game object index)
-        public void RedrawPlayer(int objectIndex, RedrawType type)
-        {
-            if (!this.ApiAvailable) return;
-
-            try 
-            { 
-                this.redrawObjectSub?.Invoke(objectIndex, type); 
-            }
-            catch (Exception ex) 
-            { 
-                Service.PluginLog.Error($"Error triggering targeted Penumbra Redraw for index {objectIndex}: {ex}"); 
+                // Suppress transient IPC errors gracefully
             }
         }
 
         public void Dispose()
         {
-            this.initializedSub?.Dispose();
-            this.disposedSub?.Dispose();
-            this.creatingCharaSub?.Dispose();
+            // Cleanup IPC resources
         }
     }
 }

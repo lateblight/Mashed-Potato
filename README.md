@@ -26,7 +26,7 @@ Let's be completely honest: the broader modding culture surrounding certain play
    `https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/repo.json`
 6. Click **`+`** again, then hit **Save and Close**[cite: 2].
 7. Open the Dalamud Plugin Installer (`/xlplugins`), find both Penumbra and Mashed Potato in the *Available Plugins* tab, and click install[cite: 2].
-8. Type `/mash` in chat to open the configuration menu and choose your preferred target race[cite: 2]. You can also type `/mash on` or `/mash off` to quickly toggle the filter on the fly[cite: 2].
+8. Type `/mash` in chat to open the configuration menu and choose your preferred target race[cite: 1]. You can also type `/mash on` or `/mash off` to quickly toggle the visual transformation filter on the fly[cite: 1].
 
 ### 🛡️ The Whitelist Feature (For Trusted Friends)
 We know that not *all* Lalafells are problematic—you might have close friends who play them normally and whom you want to see in their original form[cite: 2]. 

@@ -1,12 +1,9 @@
-// File: ./MashedPotato/Plugin.cs
+// File: MashedPotato/Plugin.cs
 
-using Dalamud.Game.Command;
-using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Interface.Windowing;
+using System;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Penumbra.Api.Enums;
+using Dalamud.Interface.Windowing;
 using MashedPotato.Utils;
 using MashedPotato.Windows;
 
@@ -14,9 +11,17 @@ namespace MashedPotato
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public static string Name => "Mashed Potato";
-        private const string CommandName = "/mash";
-        public WindowSystem WindowSystem { get; } = new("Mashed Potato");
+        public string Name => "Mashed Potato";
+
+        private readonly IDalamudPluginInterface pluginInterface;
+        private readonly ICommandManager commandManager;
+        private readonly WindowSystem windowSystem;
+
+        public Configuration Configuration { get; init; }
+        public PenumbraIpc PenumbraApi { get; init; }
+        public WhitelistManager WhitelistManager { get; init; }
+        public Nameplate NameplateManager { get; init; }
+        public Drawer DrawerManager { get; init; }
 
         public Plugin(
             IDalamudPluginInterface pluginInterface,
@@ -26,8 +31,12 @@ namespace MashedPotato
             IContextMenu contextMenu,
             IPluginLog pluginLog,
             INamePlateGui namePlateGui,
-            IObjectTable objectTable) // Injecting the object table here
+            IObjectTable objectTable)
         {
+            this.pluginInterface = pluginInterface;
+            this.commandManager = commandManager;
+
+            // Initialise Service locator
             Service.pluginInterface = pluginInterface;
             Service.clientState = clientState;
             Service.commandManager = commandManager;
@@ -35,102 +44,82 @@ namespace MashedPotato
             Service.contextMenu = contextMenu;
             Service.PluginLog = pluginLog;
             Service.namePlateGui = namePlateGui;
-            
-            // Storing the object table in our Service directory
             Service.objectTable = objectTable;
-
-            Service.configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            if (!Service.configuration.stayOn) { Service.configuration.enabled = false; }
-            Service.configuration.Initialize(pluginInterface);
             Service.plugin = this;
-            Service.penumbraApi = new PenumbraIpc(pluginInterface);
-            Service.configWindow = new ConfigWindow(this);
-            WindowSystem.AddWindow(Service.configWindow);
+
+            // Load Configuration
+            Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Configuration.Initialize(pluginInterface);
+            Service.configuration = Configuration;
+
+            // Initialise Managers and IPC wrappers
+            PenumbraApi = new PenumbraIpc(pluginInterface);
+            Service.penumbraApi = PenumbraApi;
+
+            WhitelistManager = new WhitelistManager(Configuration, contextMenu, chatGui);
+            Service.whitelistManager = WhitelistManager;
+
+            NameplateManager = new Nameplate();
+            Service.nameplate = NameplateManager;
+
+            DrawerManager = new Drawer();
+            Service.drawer = DrawerManager;
+
+            // Initialise UI Windows
+            windowSystem = new WindowSystem(Name);
             
-            Service.drawer = new Drawer();
-            Service.nameplate = new Nameplate();
-            Service.whitelistManager = new WhitelistManager(Service.configuration, Service.contextMenu, Service.chatGui);
+            var configWindow = new ConfigWindow(this, Configuration);
+            Service.configWindow = configWindow;
+            windowSystem.AddWindow(configWindow);
 
-            // Subscribe to the whitelist changed event with the specific player name
-            Service.whitelistManager.OnWhitelistChanged += HandleWhitelistChanged;
+            pluginInterface.UiBuilder.Draw += windowSystem.Draw;
+            pluginInterface.UiBuilder.OpenConfigUi += () => {
+                configWindow.InvokeConfigChanged();
+                configWindow.Toggle();
+            };
 
-            pluginInterface.UiBuilder.Draw += DrawUI;
-            pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            pluginInterface.UiBuilder.OpenMainUi += DrawConfigUI;
+            // Register main UI callback to satisfy Dalamud validation checks
+            pluginInterface.UiBuilder.OpenMainUi += () => {
+                configWindow.Toggle();
+            };
 
-            Service.commandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            // Register Commands
+            commandManager.AddHandler("/mash", new Dalamud.Game.Command.CommandInfo(OnCommand)
             {
-                HelpMessage = "Opens Mashed Potato config menu. Use /mash on or /mash off."
+                HelpMessage = "Toggles the Mashed Potato configuration window or toggles the filter on/off ('/mash on' or '/mash off')."
             });
-            Service.clientState.TerritoryChanged += OnTerritoryChanged;
-        }
-
-        private void HandleWhitelistChanged(string playerName)
-        {
-            if (!Service.configuration.enabled) return;
-            
-            // Pass the specific name to Drawer so it only refreshes the target!
-            Drawer.RefreshPlayer(playerName);
-        }
-
-        public static void OutputChatLine(SeString message)
-        {
-            var sb = new SeStringBuilder().AddUiForeground("[Mashed Potato] ", 58).Append(message);
-            Service.chatGui.Print(new XivChatEntry { Message = sb.BuiltString });
-        }
-
-        public void Dispose()
-        {
-            Service.clientState.TerritoryChanged -= OnTerritoryChanged;
-            WindowSystem.RemoveAllWindows();
-            Service.penumbraApi?.Dispose();
-            Service.drawer?.Dispose();
-            Service.nameplate?.Dispose();
-            
-            if (Service.whitelistManager != null)
-            {
-                Service.whitelistManager.OnWhitelistChanged -= HandleWhitelistChanged;
-                Service.whitelistManager.Dispose();
-            }
-
-            Service.commandManager?.RemoveHandler(CommandName);
-        }
-
-        private void OnTerritoryChanged() => HandleAreaChange();
-        private void OnTerritoryChanged(ushort a) => HandleAreaChange();
-        private void OnTerritoryChanged(uint a) => HandleAreaChange();
-        private void OnTerritoryChanged(int a) => HandleAreaChange();
-        private void OnTerritoryChanged(ushort a, ushort b) => HandleAreaChange();
-        private void OnTerritoryChanged(uint a, uint b) => HandleAreaChange();
-        private void OnTerritoryChanged(int a, int b) => HandleAreaChange();
-        private void OnTerritoryChanged(object? a, ushort b) => HandleAreaChange();
-        private void OnTerritoryChanged(object? a, uint b) => HandleAreaChange();
-        private void OnTerritoryChanged(object? a, int b) => HandleAreaChange();
-
-        private void HandleAreaChange()
-        {
-            if (!Service.configuration.stayOn && Service.configuration.enabled)
-            {
-                Service.configuration.enabled = false;
-                Service.configuration.Save();
-                Service.configWindow.InvokeConfigChanged();
-                Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
-                OutputChatLine("You entered a new area. Mashed Potato has automatically turned off.");
-            }
         }
 
         private void OnCommand(string command, string args)
         {
-            if (args == "on") { Service.configuration.enabled = true; }
-            else if (args == "off") { Service.configuration.enabled = false; }
-            else { Service.configWindow.IsOpen = true; return; }
-
-            Service.configuration.Save();
-            Service.configWindow.InvokeConfigChanged();
-            Service.penumbraApi?.RedrawAll(RedrawType.Redraw);
+            if (args.Equals("on", StringComparison.OrdinalIgnoreCase))
+            {
+                Configuration.enabled = true;
+                Configuration.Save();
+                Service.chatGui.Print("[Mashed Potato] Filter enabled.");
+            }
+            else if (args.Equals("off", StringComparison.OrdinalIgnoreCase))
+            {
+                Configuration.enabled = false;
+                Configuration.Save();
+                Service.chatGui.Print("[Mashed Potato] Filter disabled.");
+            }
+            else
+            {
+                Service.configWindow.Toggle();
+            }
         }
 
-        private void DrawUI() => WindowSystem.Draw();
-        public static void DrawConfigUI() => Service.configWindow.IsOpen = true;
+        public void Dispose()
+        {
+            commandManager.RemoveHandler("/mash");
+            pluginInterface.UiBuilder.Draw -= windowSystem.Draw;
+            pluginInterface.UiBuilder.OpenMainUi -= Service.configWindow.Toggle;
+            
+            NameplateManager?.Dispose();
+            WhitelistManager?.Dispose();
+            DrawerManager?.Dispose();
+            PenumbraApi?.Dispose();
+        }
     }
 }

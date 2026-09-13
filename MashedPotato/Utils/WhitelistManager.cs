@@ -1,73 +1,59 @@
-// File: ./MashedPotato/Utils/WhitelistManager.cs
+// File: MashedPotato/Utils/WhitelistManager.cs
 
 using System;
-using Dalamud.Game.Gui.ContextMenu;
+using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Plugin.Services;
 
-namespace MashedPotato.Utils;
-
-public class WhitelistManager : IDisposable
+namespace MashedPotato.Utils
 {
-    private readonly Configuration configuration;
-    private readonly IContextMenu contextMenu;
-    private readonly IChatGui chatGui;
-
-    // Fired whenever the whitelist is modified, passing the player's name for a targeted redraw
-    public event Action<string>? OnWhitelistChanged;
-
-    public WhitelistManager(Configuration configuration, IContextMenu contextMenu, IChatGui chatGui)
+    public class WhitelistManager : IDisposable
     {
-        this.configuration = configuration;
-        this.contextMenu = contextMenu;
-        this.chatGui = chatGui;
+        private readonly Configuration configuration;
+        private readonly IContextMenu contextMenu;
+        private readonly IChatGui chatGui;
 
-        // Subscribe to the menu opened event required by API 15.
-        this.contextMenu.OnMenuOpened += OnMenuOpened;
-    }
+        public event Action<string>? OnWhitelistChanged;
 
-    private void OnMenuOpened(IMenuOpenedArgs args)
-    {
-        // MenuTargetDefault applies to players clicked in the world, party list, and friends list.
-        if (args.Target is MenuTargetDefault target)
+        public WhitelistManager(Configuration configuration, IContextMenu contextMenu, IChatGui chatGui)
         {
-            string playerName = target.TargetName;
-            
-            // Failsafe to ensure a name actually exists
-            if (string.IsNullOrEmpty(playerName)) return;
+            this.configuration = configuration;
+            this.contextMenu = contextMenu;
+            this.chatGui = chatGui;
+        }
 
-            bool isWhitelisted = configuration.WhitelistedPlayers.Contains(playerName);
-            string menuLabel = isWhitelisted ? "Remove from Mashed Potato Whitelist" : "Add to Mashed Potato Whitelist";
+        public bool IsWhitelisted(string playerName)
+        {
+            if (string.IsNullOrWhiteSpace(playerName)) return false;
+            return configuration.WhitelistedPlayers != null &&
+                   configuration.WhitelistedPlayers.Contains(playerName, StringComparer.OrdinalIgnoreCase);
+        }
 
-            // Add the custom option to the context menu
-            args.AddMenuItem(new MenuItem
+        public void AddPlayer(string playerName)
+        {
+            if (string.IsNullOrWhiteSpace(playerName)) return;
+            if (!IsWhitelisted(playerName))
             {
-                Name = menuLabel,
-                OnClicked = _ => ToggleWhitelist(playerName)
-            });
+                configuration.WhitelistedPlayers.Add(playerName);
+                configuration.Save();
+                OnWhitelistChanged?.Invoke(playerName);
+            }
         }
-    }
 
-    private void ToggleWhitelist(string playerName)
-    {
-        if (configuration.WhitelistedPlayers.Contains(playerName))
+        public void RemovePlayer(string playerName)
         {
-            configuration.WhitelistedPlayers.Remove(playerName);
-            chatGui.Print($"[Mashed Potato] Removed {playerName} from your whitelist.");
+            if (string.IsNullOrWhiteSpace(playerName)) return;
+            if (IsWhitelisted(playerName))
+            {
+                configuration.WhitelistedPlayers.Remove(playerName);
+                configuration.Save();
+                OnWhitelistChanged?.Invoke(playerName);
+            }
         }
-        else
+
+        public void Dispose()
         {
-            configuration.WhitelistedPlayers.Add(playerName);
-            chatGui.Print($"[Mashed Potato] Added {playerName} to your whitelist.");
+            // Clean up context menu hooks
         }
-
-        configuration.Save();
-
-        // Broadcast the specific player's name so the plugin triggers an immediate character refresh!
-        OnWhitelistChanged?.Invoke(playerName);
-    }
-
-    public void Dispose()
-    {
-        this.contextMenu.OnMenuOpened -= OnMenuOpened;
     }
 }
