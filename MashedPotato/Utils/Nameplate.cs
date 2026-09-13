@@ -42,8 +42,7 @@ namespace MashedPotato.Utils
                     var obj = handler.GameObject;
                     if (obj != null && obj.Address != IntPtr.Zero)
                     {
-                        // Check the unmanaged GameObject's ObjectKind directly against ObjectKind.Pc
-                        // to ensure we only target actual player characters and leave NPCs unmolested.
+                        // Check unmanaged GameObject ObjectKind directly against ObjectKind.Pc
                         var gameObj = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)obj.Address;
                         if (gameObj->ObjectKind != ObjectKind.Pc)
                         {
@@ -61,17 +60,16 @@ namespace MashedPotato.Utils
                             continue; // Leave our trusted whitelisted ankle-biters alone
                         }
 
-                        // Cast the native object address directly to an unmanaged Character pointer[cite: 3]
+                        // Cast native object address directly to an unmanaged Character pointer
                         var character = (Character*)obj.Address;
                         if (character != null)
                         {
-                            // Inspect the character's customize data array directly via byte pointer arithmetic.
-                            // The very first byte (index 0) represents the playable race ID (3 = Lalafell).
+                            // Inspect customize data array via byte pointer arithmetic (Index 0 = Race ID 3 / Lalafell)
                             byte* customizePtr = (byte*)(&character->DrawData.CustomizeData);
                             if (customizePtr != null && customizePtr[0] == 3)
                             {
                                 handler.DisplayTitle = true;
-                                handler.Title = "[ * ]";
+                                handler.Title = "*";
                             }
                         }
                     }

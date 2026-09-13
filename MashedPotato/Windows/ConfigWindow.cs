@@ -39,12 +39,12 @@ namespace MashedPotato.Windows
             {
                 if (ImGui.BeginTabItem("General Settings"))
                 {
-                    ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f), "Welcome to Mashed Potato! [ * ]");
+                    ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f), "Welcome to Mashed Potato! *");
                     ImGui.Text("Configure how you want to transform Lalafells below.");
                     ImGui.Spacing();
 
                     bool enabled = configuration.enabled;
-                    if (ImGui.Checkbox("Enable Mashed Potato (Mash up Lalafells)", ref enabled))
+                    if (ImGui.Checkbox("Enable Mashed Potato (Mash up Lalas)", ref enabled))
                     {
                         configuration.enabled = enabled;
                         configuration.Save();
@@ -58,7 +58,7 @@ namespace MashedPotato.Windows
                     }
 
                     bool nameHQ = configuration.nameHQ;
-                    if (ImGui.Checkbox("Show indicator on nameplates ([ * ])", ref nameHQ))
+                    if (ImGui.Checkbox("Show indicator on nameplates (*)", ref nameHQ))
                     {
                         configuration.nameHQ = nameHQ;
                         configuration.Save();
@@ -68,7 +68,7 @@ namespace MashedPotato.Windows
                     ImGui.Separator();
                     ImGui.Spacing();
 
-                    ImGui.Text("Mashed Potato is brought to you by Lateblight[cite: 1].");
+                    ImGui.Text("Mashed Potato is brought to you by Lateblight.");
                     
                     if (ImGui.Button("GitHub Repo"))
                     {
@@ -107,7 +107,6 @@ namespace MashedPotato.Windows
 
                     if (configuration.WhitelistedPlayers != null && configuration.WhitelistedPlayers.Count > 0)
                     {
-                        // A clean, beautifully proportioned ImGui table with scroll support
                         if (ImGui.BeginTable("WhitelistTable", 2, ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 190)))
                         {
                             ImGui.TableSetupColumn("Character Name", ImGuiTableColumnFlags.WidthStretch);
@@ -134,7 +133,7 @@ namespace MashedPotato.Windows
                     {
                         ImGui.TextDisabled("No players currently whitelisted.");
                         ImGui.Spacing();
-                        ImGui.TextDisabled("Tip: You can also right-click players in the game world, chat, or party list to add them[cite: 1]!");
+                        ImGui.TextDisabled("Tip: You can also right-click players in the game world, chat, or party list to add them.");
                     }
 
                     ImGui.EndTabItem();
