@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "MashedPotato/1.4.0.14": {
+      "MashedPotato/1.4.0.15": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
           "Luna": "1.7.1.2",
@@ -222,7 +222,7 @@
     }
   },
   "libraries": {
-    "MashedPotato/1.4.0.14": {
+    "MashedPotato/1.4.0.15": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
