@@ -1,0 +1,360 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "MashedPotato/1.4.0.8": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
+          "Luna": "1.7.1.2",
+          "Penumbra.Api": "1.7.1.2"
+        },
+        "runtime": {
+          "MashedPotato.dll": {}
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.0": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions/9.0.0": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "Luna/1.7.1.2": {
+        "runtime": {
+          "Luna.dll": {
+            "assemblyVersion": "1.7.1.2",
+            "fileVersion": "1.7.1.2"
+          }
+        }
+      },
+      "Penumbra.Api/1.7.1.2": {
+        "runtime": {
+          "Penumbra.Api.dll": {
+            "assemblyVersion": "1.7.1.2",
+            "fileVersion": "1.7.1.2"
+          }
+        }
+      },
+      "Dalamud.Common/1.0.0.0": {
+        "runtime": {
+          "Dalamud.Common.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "TerraFX.Interop.Windows/10.0.26100.5": {
+        "runtime": {
+          "TerraFX.Interop.Windows.dll": {
+            "assemblyVersion": "10.0.26100.5",
+            "fileVersion": "10.0.26100.5"
+          }
+        }
+      },
+      "Reloaded.Hooks.Definitions/1.14.0.0": {
+        "runtime": {
+          "Reloaded.Hooks.Definitions.dll": {
+            "assemblyVersion": "1.14.0.0",
+            "fileVersion": "1.14.0.0"
+          }
+        }
+      },
+      "SQLite-net/1.9.172.0": {
+        "runtime": {
+          "SQLite-net.dll": {
+            "assemblyVersion": "1.9.172.0",
+            "fileVersion": "1.9.172.0"
+          }
+        }
+      },
+      "BitFaster.Caching/2.5.4.0": {
+        "runtime": {
+          "BitFaster.Caching.dll": {
+            "assemblyVersion": "2.5.4.0",
+            "fileVersion": "2.5.4.0"
+          }
+        }
+      },
+      "Iced/1.17.0.0": {
+        "runtime": {
+          "Iced.dll": {
+            "assemblyVersion": "1.17.0.0",
+            "fileVersion": "1.17.0.0"
+          }
+        }
+      },
+      "Serilog.Sinks.File/7.0.0.0": {
+        "runtime": {
+          "Serilog.Sinks.File.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.0.0.0"
+          }
+        }
+      },
+      "Serilog.Sinks.Async/2.1.0.0": {
+        "runtime": {
+          "Serilog.Sinks.Async.dll": {
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
+          }
+        }
+      },
+      "Serilog.Sinks.Console/6.1.1.0": {
+        "runtime": {
+          "Serilog.Sinks.Console.dll": {
+            "assemblyVersion": "6.1.1.0",
+            "fileVersion": "6.1.1.0"
+          }
+        }
+      },
+      "goatcorp.Reloaded.Hooks/4.2.1.0": {
+        "runtime": {
+          "goatcorp.Reloaded.Hooks.dll": {
+            "assemblyVersion": "4.2.1.0",
+            "fileVersion": "4.2.1.0"
+          }
+        }
+      },
+      "CheapLoc/1.1.8.0": {
+        "runtime": {
+          "CheapLoc.dll": {
+            "assemblyVersion": "1.1.8.0",
+            "fileVersion": "1.1.8.0"
+          }
+        }
+      },
+      "System.Reactive/6.1.0.0": {
+        "runtime": {
+          "System.Reactive.dll": {
+            "assemblyVersion": "6.1.0.0",
+            "fileVersion": "6.1.0.62682"
+          }
+        }
+      },
+      "CommunityToolkit.HighPerformance/8.4.0.0": {
+        "runtime": {
+          "CommunityToolkit.HighPerformance.dll": {
+            "assemblyVersion": "8.4.0.0",
+            "fileVersion": "8.4.0.1"
+          }
+        }
+      },
+      "HexaGen.Runtime/1.1.0.0": {
+        "runtime": {
+          "HexaGen.Runtime.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      },
+      "BCnEncoder/2.2.1.0": {
+        "runtime": {
+          "BCnEncoder.dll": {
+            "assemblyVersion": "2.2.1.0",
+            "fileVersion": "2.2.1.0"
+          }
+        }
+      },
+      "SQLitePCLRaw.core/2.1.2.1721": {
+        "runtime": {
+          "SQLitePCLRaw.core.dll": {
+            "assemblyVersion": "2.1.2.1721",
+            "fileVersion": "2.1.2.1721"
+          }
+        }
+      },
+      "SQLitePCLRaw.batteries_v2/2.1.2.1721": {
+        "runtime": {
+          "SQLitePCLRaw.batteries_v2.dll": {
+            "assemblyVersion": "2.1.2.1721",
+            "fileVersion": "2.1.2.1721"
+          }
+        }
+      },
+      "Reloaded.Memory/7.0.0.0": {
+        "runtime": {
+          "Reloaded.Memory.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.0.0.0"
+          }
+        }
+      },
+      "goatcorp.Reloaded.Memory.Buffers/2.0.2.0": {
+        "runtime": {
+          "goatcorp.Reloaded.Memory.Buffers.dll": {
+            "assemblyVersion": "2.0.2.0",
+            "fileVersion": "2.0.2.0"
+          }
+        }
+      },
+      "Mono.Cecil/0.11.3.0": {
+        "runtime": {
+          "Mono.Cecil.dll": {
+            "assemblyVersion": "0.11.3.0",
+            "fileVersion": "0.11.3.0"
+          }
+        }
+      },
+      "SQLitePCLRaw.provider.e_sqlite3/2.1.2.1721": {
+        "runtime": {
+          "SQLitePCLRaw.provider.e_sqlite3.dll": {
+            "assemblyVersion": "2.1.2.1721",
+            "fileVersion": "2.1.2.1721"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MashedPotato/1.4.0.8": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+6f2qv2a3dLwd5w6JanPIPs47CxRbnk+ZocMJUhv9NxP88VlOcJYZs9jY+MYSjxvady08bUZn6qgiNh7DadGgg==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.0",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.9.0.0.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.Abstractions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-g0UfujELzlLbHoVG8kPKVBaW470Ewi+jnptGS9KUi6jcb+k2StujtK3m26DFSGGwQ/+bVgZfsWqNzlP6YOejvw==",
+      "path": "microsoft.extensions.logging.abstractions/9.0.0",
+      "hashPath": "microsoft.extensions.logging.abstractions.9.0.0.nupkg.sha512"
+    },
+    "Luna/1.7.1.2": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Penumbra.Api/1.7.1.2": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Dalamud.Common/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TerraFX.Interop.Windows/10.0.26100.5": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Reloaded.Hooks.Definitions/1.14.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SQLite-net/1.9.172.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BitFaster.Caching/2.5.4.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Iced/1.17.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.File/7.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.Async/2.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.Console/6.1.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "goatcorp.Reloaded.Hooks/4.2.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CheapLoc/1.1.8.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Reactive/6.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CommunityToolkit.HighPerformance/8.4.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "HexaGen.Runtime/1.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BCnEncoder/2.2.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SQLitePCLRaw.core/2.1.2.1721": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SQLitePCLRaw.batteries_v2/2.1.2.1721": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Reloaded.Memory/7.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "goatcorp.Reloaded.Memory.Buffers/2.0.2.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Mono.Cecil/0.11.3.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SQLitePCLRaw.provider.e_sqlite3/2.1.2.1721": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

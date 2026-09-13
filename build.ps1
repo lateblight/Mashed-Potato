@@ -1,116 +1,139 @@
-# File: ./build.ps1
+# ==============================================================================
+# Mashed Potato Build & Release Automation Script
+# Target: .NET 10 / Dalamud API 15
+# Maintainer: Lateblight
+# ==============================================================================
 
-# File: build.ps1
-
-<#
-.SYNOPSIS
-    Bulletproof Automated Build, Version Bump, File Header Stamping, & Flat-Zip Pipeline for Mashed-Potato
-#>
+[CmdletBinding()]
+param(
+    [string]$Configuration = "Release"
+)
 
 $ErrorActionPreference = "Stop"
 
+# Force absolute path resolution to prevent null path binding errors
+$RootPath = $PSScriptRoot
+if (-not $RootPath) {
+    $RootPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+}
+
+$ProjectName = "MashedPotato"
+$ProjectDir = Join-Path $RootPath $ProjectName
+$CsprojPath = Join-Path $ProjectDir "$ProjectName.csproj"
+$JsonPath = Join-Path $ProjectDir "$ProjectName.json"
+$RepoJsonPath = Join-Path $RootPath "repo.json"
+$StageDir = Join-Path $RootPath "stage"
+$LibDir = Join-Path $RootPath "lib"
+
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [Mashed Potato] Starting Automated Build Pipeline" -ForegroundColor Cyan
+Write-Host " 🥔 Initialising Mashed Potato Build Sequence..." -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-Write-Host "[1/6] Stamping file location headers on source files..." -ForegroundColor Yellow
-$sourceFiles = Get-ChildItem -Recurse -File | Where-Object { 
-    $_.Extension -match '(.cs|.ps1)$' -and $_.FullName -notmatch '\\(bin|obj|lib|\.vs|\.git|tools)\\' 
+# 1. Ensure local lib directory exists for offline assembly security
+if (!(Test-Path $LibDir)) {
+    Write-Host "[1/6] Creating local lib directory for offline DLLs..." -ForegroundColor Yellow
+    New-Item -ItemType Directory -Path $LibDir | Out-Null
 }
 
-foreach ($file in $sourceFiles) {
-    $relativePath = (Resolve-Path -Relative $file.FullName).Replace('\', '/')
-    $content = Get-Content $file.FullName -Raw
-    
-    if ([string]::IsNullOrEmpty($content)) { continue }
-
-    $expectedHeader = "// File: $relativePath"
-    if ($file.Extension -eq '.ps1') { $expectedHeader = "# File: $relativePath" }
-
-    if (-not $content.StartsWith($expectedHeader)) {
-        Set-Content -Path $file.FullName -Value "$expectedHeader`n`n$content" -Encoding UTF8
-        Write-Host " -> Stamped header on: $relativePath" -ForegroundColor DarkGray
-    }
+# 2. Parse and Auto-Increment Version across manifests
+Write-Host "[2/6] Parsing and bumping project version..." -ForegroundColor Yellow
+if (!(Test-Path $CsprojPath)) {
+    throw "Could not locate project file at: $CsprojPath"
 }
 
-Write-Host "[2/6] Auto-incrementing plugin version..." -ForegroundColor Yellow
-$csprojPath = "MashedPotato/MashedPotato.csproj"
-$manifestPath = "MashedPotato/MashedPotato.json"
-$repoPath = "repo.json"
+[xml]$csproj = Get-Content $CsprojPath
+$propertyGroup = $csproj.Project.PropertyGroup | Select-Object -First 1
 
-$csprojContent = Get-Content $csprojPath -Raw
-if ($csprojContent -match '<Version>(.*?)</Version>') {
-    $currentVersion = $Matches[1]
-} else {
-    $currentVersion = "1.2.0.0"
+$currentVersion = $propertyGroup.Version
+if (-not $currentVersion) {
+    $currentVersion = "1.4.0.0"
 }
 
-Write-Host "Current Version detected: $currentVersion" -ForegroundColor DarkGray
+# Split version and increment the minor/build patch (e.g., 1.4.0.x)
+$verParts = $currentVersion.Split('.')
+[int]$patch = $verParts[-1]
+$patch++
+$verParts[-1] = $patch.ToString()
+$newVersion = [string]::Join('.', $verParts)
 
-$versionParts = $currentVersion.Split('.')
-if ($versionParts.Length -eq 4) {
-    $buildNum = [int]$versionParts[3] + 1
-    $newVersion = "$($versionParts[0]).$($versionParts[1]).$($versionParts[2]).$buildNum"
-} else {
-    $newVersion = "$currentVersion.1"
+# Explicitly set version properties
+$propertyGroup.Version = $newVersion
+if ($propertyGroup.AssemblyVersion) { 
+    $propertyGroup.AssemblyVersion = $newVersion 
+} else { 
+    $propertyGroup.AppendChild($csproj.CreateElement("AssemblyVersion", $csproj.DocumentElement.NamespaceURI)).InnerText = $newVersion 
 }
-Write-Host "Bumping Version -> $newVersion" -ForegroundColor Green
-
-if ($csprojContent -match '<Version>.*?</Version>') {
-    $csprojContent = $csprojContent -replace '<Version>.*?</Version>', "<Version>$newVersion</Version>"
-} else {
-    $csprojContent = $csprojContent -replace '<PropertyGroup>', "<PropertyGroup>`n    <Version>$newVersion</Version>"
-}
-Set-Content -Path $csprojPath -Value $csprojContent -NoNewline -Encoding UTF8
-
-if (Test-Path $manifestPath) {
-    $manifestJson = Get-Content $manifestPath -Raw | ConvertFrom-Json
-    $manifestJson.AssemblyVersion = $newVersion
-    $manifestJson | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
+if ($propertyGroup.FileVersion) { 
+    $propertyGroup.FileVersion = $newVersion 
+} else { 
+    $propertyGroup.AppendChild($csproj.CreateElement("FileVersion", $csproj.DocumentElement.NamespaceURI)).InnerText = $newVersion 
 }
 
-if (Test-Path $repoPath) {
-    $repoJson = Get-Content $repoPath -Raw | ConvertFrom-Json
-    $repoArray = @($repoJson)
-    foreach ($entry in $repoArray) {
-        if ($entry.InternalName -eq "MashedPotato") {
-            $entry.AssemblyVersion = $newVersion
+$csproj.Save($CsprojPath)
+
+# Update Plugin JSON
+if (Test-Path $JsonPath) {
+    $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
+    $pluginJson.AssemblyVersion = $newVersion
+    $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath
+}
+
+# Update Repo JSON safely
+if (Test-Path $RepoJsonPath) {
+    $repoJson = Get-Content $RepoJsonPath -Raw | ConvertFrom-Json
+    for ($i = 0; $i -lt $repoJson.Count; $i++) {
+        if ($repoJson[$i].InternalName -eq $ProjectName) {
+            $repoJson[$i].AssemblyVersion = $newVersion
+            if ($repoJson[$i].PSObject.Properties['DownloadLink']) {
+                $repoJson[$i].DownloadLink = "https://github.com/lateblight/Mashed-Potato/raw/main/latest.zip"
+            } elseif ($repoJson[$i].PSObject.Properties['Url']) {
+                $repoJson[$i].Url = "https://github.com/lateblight/Mashed-Potato/raw/main/latest.zip"
+            }
         }
     }
-    # FIX: Removed the malformed `--json` encoding argument causing the Ubuntu runner to crash
-    ConvertTo-Json -InputObject $repoArray -Depth 10 | Set-Content $repoPath -Encoding UTF8
+    $repoJson | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
 }
 
+Write-Host "✨ Bumping Version -> $newVersion" -ForegroundColor Green
+
+# 3. Prepare Staging Directories
 Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
-$stageDir = "MashedPotato/stage"
-if (Test-Path $stageDir) { Remove-Item -Recurse -Force $stageDir }
-if (Test-Path "latest.zip") { Remove-Item -Force "latest.zip" -ErrorAction SilentlyContinue }
+if (Test-Path $StageDir) {
+    Remove-Item -Recurse -Force $StageDir
+}
+New-Item -ItemType Directory -Path $StageDir | Out-Null
 
+# 4. Compile Project directly to Staging
 Write-Host "[4/6] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Yellow
-Push-Location "MashedPotato"
-dotnet publish -c Release -o "stage"
-Pop-Location
+dotnet publish $CsprojPath -c $Configuration -o $StageDir --nologo
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "[Error] Compilation failed."
-    exit $LASTEXITCODE
-}
-
+# 5. Scrub Prohibited Core Game Assemblies & Inject Assets
 Write-Host "[5/6] Scrubbing prohibited core game assemblies & injecting manifest..." -ForegroundColor Yellow
-$prohibited = @("Dalamud*.dll", "Lumina*.dll", "ImGui*.dll", "FFXIVClientStructs*.dll")
+
+$prohibited = @("ImGui*.dll", "FFXIVClientStructs*.dll", "Dalamud*.dll", "Interop*.dll")
 foreach ($pattern in $prohibited) {
-    Get-ChildItem -Path $stageDir -Filter $pattern -ErrorAction SilentlyContinue | Remove-Item -Force
+    Get-ChildItem -Path $StageDir -Filter $pattern -ErrorAction SilentlyContinue | ForEach-Object {
+        Write-Host "   -> Scrubbing prohibited assembly: $($_.Name)" -ForegroundColor Red
+        Remove-Item $_.FullName -Force
+    }
 }
-Copy-Item $manifestPath -Destination "$stageDir/MashedPotato.json" -Force
 
+$iconSrc = Join-Path $RootPath "image\icon.png"
+if (Test-Path $iconSrc) {
+    Copy-Item $iconSrc (Join-Path $StageDir "icon.png")
+}
+
+Copy-Item $JsonPath (Join-Path $StageDir "$ProjectName.json")
+
+# 6. Create Flat latest.zip Release Bundle
 Write-Host "[6/6] Creating final flat latest.zip..." -ForegroundColor Yellow
-$zipPath = "latest.zip"
-Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
+$ZipPath = Join-Path $RootPath "latest.zip"
+if (Test-Path $ZipPath) {
+    Remove-Item $ZipPath -Force
+}
 
-Remove-Item -Recurse -Force $stageDir
+Compress-Archive -Path "$StageDir\*" -DestinationPath $ZipPath -Force
 
-Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Green
 Write-Host " ✅ Build & Auto-Version Complete ($newVersion Ready)!" -ForegroundColor Green
-Write-Host "==================================================" -ForegroundColor Cyan
-
-# Triggering final v1.3.0.0 production release
+Write-Host "==================================================" -ForegroundColor Green
