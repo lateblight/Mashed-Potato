@@ -204,19 +204,20 @@ try {
 }
 catch {
     Write-Host ""
-    Write-Host "╔══════════════════════════════════════════════════════════════════════╗" -ForegroundColor Red
-    Write-Host "║                      MASHED POTATO BUILD ERROR                       ║" -ForegroundColor Red
-    Write-Host "╠══════════════════════════════════════════════════════════════════════╣" -ForegroundColor Red
-    Write-Host "│ The compiler threw a wobbly! Copy everything inside this box:        │" -ForegroundColor Yellow
-    Write-Host "╠══════════════════════════════════════════════════════════════════════╣" -ForegroundColor Red
-    Write-Host "│ Error Message: $($_.Exception.Message)                               " -ForegroundColor White
-    Write-Host "│ Line Number:   $($_.InvocationInfo.ScriptLineNumber)                 " -ForegroundColor White
-    Write-Host "│ Fully Qualified Error ID: $($_.FullyQualifiedErrorId)                " -ForegroundColor White
-    Write-Host "│ Stack Trace:                                                         " -ForegroundColor DarkGray
+    Write-Host "######################################################################" -ForegroundColor Red
+    Write-Host "#                      MASHED POTATO BUILD ERROR                     #" -ForegroundColor Red
+    Write-Host "######################################################################" -ForegroundColor Red
+    Write-Host "# >>> COPY FROM THE LINE BELOW UPON THE CLOSING HASH LINE            #" -ForegroundColor Yellow
+    Write-Host "----------------------------------------------------------------------" -ForegroundColor Yellow
+    Write-Host "Error Message:             $($_.Exception.Message)" -ForegroundColor White
+    Write-Host "Script Line Number:        $($_.InvocationInfo.ScriptLineNumber)" -ForegroundColor White
+    Write-Host "Fully Qualified Error ID:  $($_.FullyQualifiedErrorId)" -ForegroundColor White
+    Write-Host "Stack Trace:" -ForegroundColor DarkGray
     foreach ($line in ($_.ScriptStackTrace -split "`n")) {
-        Write-Host "│   $line                                                              " -ForegroundColor DarkGray
+        Write-Host "  $line" -ForegroundColor DarkGray
     }
-    Write-Host "╚══════════════════════════════════════════════════════════════════════╝" -ForegroundColor Red
+    Write-Host "----------------------------------------------------------------------" -ForegroundColor Yellow
+    Write-Host "######################################################################" -ForegroundColor Red
     Write-Host ""
     exit 1
 }
