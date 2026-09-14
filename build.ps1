@@ -27,7 +27,7 @@ $LibDir = Join-Path $RootPath "lib"
 
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " 🥔 Initialising Mashed Potato Build Sequence..." -ForegroundColor Cyan
-Write-Host "==================================================s" -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
 
 # 1. Ensure local lib directory exists for offline assembly security
 if (!(Test-Path $LibDir)) {
@@ -71,31 +71,59 @@ if ($propertyGroup.FileVersion) {
 
 $csproj.Save($CsprojPath)
 
-# Update Plugin JSON (MashedPotato.json) preserving all other properties (Author, Tags, Description)
+# Update Plugin JSON (MashedPotato.json) preserving all other properties
 if (Test-Path $JsonPath) {
     $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
     $pluginJson.AssemblyVersion = $newVersion
     $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath
 }
 
-# Update Repo JSON (repo.json) preserving author arrays, tags, and description fields
+# Update Repo JSON (repo.json) with strict array enforcement to prevent bracket stripping
 if (Test-Path $RepoJsonPath) {
-    $repoJson = Get-Content $RepoJsonPath -Raw | ConvertFrom-Json
-    for ($i = 0; $i -lt $repoJson.Count; $i++) {
-        if ($repoJson[$i].InternalName -eq $ProjectName) {
-            $repoJson[$i].AssemblyVersion = $newVersion
-            if ($repoJson[$i].PSObject.Properties['DownloadLinkInstall']) {
-                $repoJson[$i].DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+    $jsonContent = Get-Content $RepoJsonPath -Raw
+    $rawRepo = $jsonContent | ConvertFrom-Json
+    
+    # CRITICAL: Force PowerShell to retain array status even if only one plugin entry exists
+    $repoJson = if ($rawRepo -is [System.Array]) { 
+        [System.Collections.Generic.List[psobject]]$rawRepo 
+    } else { 
+        [System.Collections.Generic.List[psobject]]@($rawRepo) 
+    }
+
+    $found = $false
+    foreach ($entry in $repoJson) {
+        if ($entry.InternalName -eq $ProjectName) {
+            $found = $true
+            $entry.AssemblyVersion = $newVersion
+
+            # Ensure mandatory Dalamud API 15 & repository metadata properties exist
+            if (-not $entry.PSObject.Properties['Punchline']) {
+                $entry | Add-Member -NotePropertyName 'Punchline' -NotePropertyValue 'Transforms Lalafells into other races.' -Force
             }
-            if ($repoJson[$i].PSObject.Properties['DownloadLinkUpdate']) {
-                $repoJson[$i].DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            if (-not $entry.PSObject.Properties['DalamudApiLevel']) {
+                $entry | Add-Member -NotePropertyName 'DalamudApiLevel' -NotePropertyValue 15 -Force
             }
-            if ($repoJson[$i].PSObject.Properties['DownloadLinkTesting']) {
-                $repoJson[$i].DownloadLinkTesting = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+
+            if ($entry.PSObject.Properties['DownloadLinkInstall']) {
+                $entry.DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            }
+            if ($entry.PSObject.Properties['DownloadLinkUpdate']) {
+                $entry.DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            }
+            if ($entry.PSObject.Properties['DownloadLinkTesting']) {
+                $entry.DownloadLinkTesting = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
             }
         }
     }
-    $repoJson | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
+
+    # If somehow the entry wasn't there, flag a warning
+    if (-not $found) {
+        Write-Host " ⚠️ Warning: MashedPotato entry missing from repo.json." -ForegroundColor Yellow
+    }
+
+    # CRITICAL: Force serialization wrapper to keep root square brackets `[ { ... } ]`
+    $finalArray = @($repoJson)
+    $finalArray | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
 }
 
 Write-Host "✨ Bumping Version -> $newVersion (Manifests protected & updated)" -ForegroundColor Green
@@ -140,4 +168,4 @@ Compress-Archive -Path "$StageDir\*" -DestinationPath $ZipPath -Force
 
 Write-Host "==================================================" -ForegroundColor Green
 Write-Host " ✅ Build & Auto-Version Complete ($newVersion Ready)!" -ForegroundColor Green
-Write-Host "==================================================" -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor Cyan
