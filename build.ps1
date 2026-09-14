@@ -131,7 +131,7 @@ try {
                 "InternalName"       = "MashedPotato"
                 "AssemblyVersion"    = $newVersion
                 "Punchline"          = "Transforms Lalafells into other races."
-                "Description"        = "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra."
+                "Description"        = "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers[cite: 2]. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker[cite: 2]."
                 "ApplicableVersion"  = "any"
                 "DalamudApiLevel"    = 15
                 "LoadPriority"       = 0

@@ -2,7 +2,7 @@
   "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
   "Name": "Mashed Potato",
   "InternalName": "MashedPotato",
-  "AssemblyVersion": "1.4.0.32",
+  "AssemblyVersion": "1.4.0.33",
   "Punchline": "Transforms Lalafells into other races.",
   "Description": "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra.",
   "ApplicableVersion": "any",
@@ -11,7 +11,7 @@
   "IsHide": "False",
   "IsTestingExclusive": "False",
   "DownloadCount": 0,
-  "LastUpdate": "1789350400",
+  "LastUpdate": "1789350480",
   "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
   "Tags": [
     "lalafell",
