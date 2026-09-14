@@ -72,14 +72,14 @@ try {
 
     $csproj.Save($CsprojPath)
 
-    # Update Plugin JSON (MashedPotato.json) preserving all other properties
+    # Update Plugin JSON (MashedPotato.json) as a STANDARD JSON OBJECT
     if (Test-Path $JsonPath) {
         $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
         $pluginJson.AssemblyVersion = $newVersion
         $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath
     }
 
-    # Update Repo JSON (repo.json) with strict schema and array enforcement
+    # Update Repo JSON (repo.json) as a JSON ARRAY using -AsArray
     if (Test-Path $RepoJsonPath) {
         $jsonContent = Get-Content $RepoJsonPath -Raw
         $rawRepo = $jsonContent | ConvertFrom-Json
@@ -131,7 +131,7 @@ try {
                 "InternalName"       = "MashedPotato"
                 "AssemblyVersion"    = $newVersion
                 "Punchline"          = "Transforms Lalafells into other races."
-                "Description"        = "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers[cite: 2]. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker[cite: 2]."
+                "Description"        = "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra."
                 "ApplicableVersion"  = "any"
                 "DalamudApiLevel"    = 15
                 "LoadPriority"       = 0
@@ -149,13 +149,8 @@ try {
             $repoJson.Add($newEntry)
         }
 
-        # CRITICAL: Force serialization wrapper to guarantee root square brackets `[ { ... } ]`
-        $finalArray = @($repoJson)
-        $jsonOutput = $finalArray | ConvertTo-Json -Depth 10
-        if (-not $jsonOutput.TrimStart().StartsWith("[")) {
-            $jsonOutput = "[$jsonOutput]"
-        }
-        $jsonOutput | Set-Content $RepoJsonPath -Encoding UTF8
+        # Save repo.json strictly as an array
+        $repoJson | ConvertTo-Json -Depth 10 -AsArray | Set-Content $RepoJsonPath -Encoding UTF8
     }
 
     Write-Host "✨ Bumping Version -> $newVersion (Manifests fully synchronised)" -ForegroundColor Green
