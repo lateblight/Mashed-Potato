@@ -97,7 +97,7 @@ if (Test-Path $RepoJsonPath) {
             $found = $true
             $entry.AssemblyVersion = $newVersion
 
-            # Ensure mandatory Dalamud API 15 and repository metadata properties exist
+            # Ensure mandatory Dalamud API 15 and full repository metadata properties exist
             $metadata = @{
                 'Punchline'           = 'Transforms Lalafells into other races.'
                 'DalamudApiLevel'     = 15
@@ -123,11 +123,38 @@ if (Test-Path $RepoJsonPath) {
     }
 
     if (-not $found) {
-        Write-Host " ⚠️ Warning: MashedPotato entry missing from repo.json." -ForegroundColor Yellow
+        Write-Host " ⚠️ Warning: MashedPotato entry missing from repo.json. Appending..." -ForegroundColor Yellow
+        $newEntry = [PSCustomObject]@{
+            "Author"             = "Lateblight, Avaflow, Ars Magna, Kelvin"
+            "Name"               = "Mashed Potato"
+            "InternalName"       = "MashedPotato"
+            "AssemblyVersion"    = $newVersion
+            "Punchline"          = "Transforms Lalafells into other races."
+            "Description"        = "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra."
+            "ApplicableVersion"  = "any"
+            "DalamudApiLevel"    = 15
+            "LoadPriority"       = 0
+            "IsHide"             = "False"
+            "IsTestingExclusive" = "False"
+            "DownloadCount"      = 0
+            "LastUpdate"         = "$currentEpoch"
+            "RepoUrl"            = "https://github.com/Lateblight/Mashed-Potato"
+            "Tags"               = @("lalafell", "penumbra", "model swap", "race swap", "visual filter")
+            "IconUrl"            = "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png"
+            "DownloadLinkInstall"= "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            "DownloadLinkUpdate" = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            "DownloadLinkTesting"= "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+        }
+        $repoJson.Add($newEntry)
     }
 
+    # CRITICAL: Force serialization wrapper to guarantee root square brackets `[ { ... } ]`
     $finalArray = @($repoJson)
-    $finalArray | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
+    $jsonOutput = $finalArray | ConvertTo-Json -Depth 10
+    if (-not $jsonOutput.TrimStart().StartsWith("[")) {
+        $jsonOutput = "[$jsonOutput]"
+    }
+    $jsonOutput | Set-Content $RepoJsonPath -Encoding UTF8
 }
 
 Write-Host "✨ Bumping Version -> $newVersion (Manifests fully synchronised)" -ForegroundColor Green
