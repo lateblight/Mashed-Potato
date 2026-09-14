@@ -1,22 +1,20 @@
-[
-  {
-    "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
-    "Name": "Mashed Potato",
-    "InternalName": "MashedPotato",
-    "AssemblyVersion": "1.4.0.23",
-    "Description": "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra.",
-    "ApplicableVersion": "any",
-    "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
-    "Tags": [
-      "lalafell",
-      "penumbra",
-      "model swap",
-      "race swap",
-      "visual filter"
-    ],
-    "IconUrl": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png",
-    "DownloadLinkInstall": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip",
-    "DownloadLinkTesting": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
-  }
-]
+{
+  "Author": "Lateblight, Avaflow, Ars Magna, Kelvin",
+  "Name": "Mashed Potato",
+  "InternalName": "MashedPotato",
+  "AssemblyVersion": "1.4.0.24",
+  "Description": "Tired of ankle-biters? This client-side visual filter swaps Lalafell models for a grown-up race of your choice without touching game servers. Features robust /mash configurations and a right-click in-game whitelist with blazing-fast, targeted character refreshing to instantly exclude specific players without screen flicker. Requires Penumbra.",
+  "ApplicableVersion": "any",
+  "RepoUrl": "https://github.com/Lateblight/Mashed-Potato",
+  "Tags": [
+    "lalafell",
+    "penumbra",
+    "model swap",
+    "race swap",
+    "visual filter"
+  ],
+  "IconUrl": "https://raw.githubusercontent.com/Lateblight/Mashed-Potato/main/image/icon.png",
+  "DownloadLinkInstall": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip",
+  "DownloadLinkUpdate": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip",
+  "DownloadLinkTesting": "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+}
