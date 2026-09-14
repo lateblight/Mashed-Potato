@@ -49,14 +49,14 @@ if (-not $currentVersion) {
     $currentVersion = "1.4.0.0"
 }
 
-# Split version and increment the minor/build patch (e.g., 1.4.0.x)
+# Split version and increment the minor/build patch
 $verParts = $currentVersion.Split('.')
 [int]$patch = $verParts[-1]
 $patch++
 $verParts[-1] = $patch.ToString()
 $newVersion = [string]::Join('.', $verParts)
 
-# Explicitly set version properties in .csproj without touching other tags
+# Explicitly set version properties in .csproj
 $propertyGroup.Version = $newVersion
 if ($propertyGroup.AssemblyVersion) { 
     $propertyGroup.AssemblyVersion = $newVersion 
@@ -78,12 +78,11 @@ if (Test-Path $JsonPath) {
     $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath
 }
 
-# Update Repo JSON (repo.json) with strict array enforcement to prevent bracket stripping
+# Update Repo JSON (repo.json) with strict schema and array enforcement
 if (Test-Path $RepoJsonPath) {
     $jsonContent = Get-Content $RepoJsonPath -Raw
     $rawRepo = $jsonContent | ConvertFrom-Json
     
-    # CRITICAL: Force PowerShell to retain array status even if only one plugin entry exists
     $repoJson = if ($rawRepo -is [System.Array]) { 
         [System.Collections.Generic.List[psobject]]$rawRepo 
     } else { 
@@ -91,42 +90,47 @@ if (Test-Path $RepoJsonPath) {
     }
 
     $found = $false
+    $currentEpoch = [int][double]::Parse((Get-Date -UFormat %s))
+
     foreach ($entry in $repoJson) {
         if ($entry.InternalName -eq $ProjectName) {
             $found = $true
             $entry.AssemblyVersion = $newVersion
 
-            # Ensure mandatory Dalamud API 15 & repository metadata properties exist
-            if (-not $entry.PSObject.Properties['Punchline']) {
-                $entry | Add-Member -NotePropertyName 'Punchline' -NotePropertyValue 'Transforms Lalafells into other races.' -Force
-            }
-            if (-not $entry.PSObject.Properties['DalamudApiLevel']) {
-                $entry | Add-Member -NotePropertyName 'DalamudApiLevel' -NotePropertyValue 15 -Force
+            # Ensure mandatory Dalamud API 15 and repository metadata properties exist
+            $metadata = @{
+                'Punchline'           = 'Transforms Lalafells into other races.'
+                'DalamudApiLevel'     = 15
+                'LoadPriority'        = 0
+                'IsHide'              = "False"
+                'IsTestingExclusive'  = "False"
+                'DownloadCount'       = 0
+                'LastUpdate'          = "$currentEpoch"
             }
 
-            if ($entry.PSObject.Properties['DownloadLinkInstall']) {
-                $entry.DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            foreach ($key in $metadata.Keys) {
+                if (-not $entry.PSObject.Properties[$key]) {
+                    $entry | Add-Member -NotePropertyName $key -NotePropertyValue $metadata[$key] -Force
+                } else {
+                    $entry.$key = $metadata[$key]
+                }
             }
-            if ($entry.PSObject.Properties['DownloadLinkUpdate']) {
-                $entry.DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
-            }
-            if ($entry.PSObject.Properties['DownloadLinkTesting']) {
-                $entry.DownloadLinkTesting = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
-            }
+
+            $entry.DownloadLinkInstall = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            $entry.DownloadLinkUpdate = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
+            $entry.DownloadLinkTesting = "https://github.com/Lateblight/Mashed-Potato/raw/main/latest.zip"
         }
     }
 
-    # If somehow the entry wasn't there, flag a warning
     if (-not $found) {
         Write-Host " ⚠️ Warning: MashedPotato entry missing from repo.json." -ForegroundColor Yellow
     }
 
-    # CRITICAL: Force serialization wrapper to keep root square brackets `[ { ... } ]`
     $finalArray = @($repoJson)
     $finalArray | ConvertTo-Json -Depth 10 | Set-Content $RepoJsonPath
 }
 
-Write-Host "✨ Bumping Version -> $newVersion (Manifests protected & updated)" -ForegroundColor Green
+Write-Host "✨ Bumping Version -> $newVersion (Manifests fully synchronised)" -ForegroundColor Green
 
 # 3. Prepare Staging Directories
 Write-Host "[3/6] Preparing staging directories..." -ForegroundColor Yellow
