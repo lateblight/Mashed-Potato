@@ -7,9 +7,9 @@
  *  | || |_|   <| | (__\__ \ |_| | | |  __/\__ \       |
  *  |  _| \__|_|\_\_|\___|___/\__|_| |_|\___||___/       |
  *                                                     
- *  [ THE DIAL-UP CYBER-DISCO BUILD & PUBLISH ENGINE ]
+ *  [ THE DIAL-UP CYBER-DISCO BUILD & PUBLISH ENGINE v1.5.0.0 ]
  *  Colder than a Polar Bear's toe-nails and faster than 56k dial-up!
- *  Enforces the Split Manifest Law and smashes bugs into next week.
+ *  Enforces the Split Manifest Law and rebases stale lease ghosts.
  *  ==================================================================
 #>
 
@@ -41,9 +41,9 @@ Write-Host " 🥔 INITIALISING MASHED POTATO ETERNAL BUILD PIPELINE... " -Foregr
 Write-Host "========================================================" -ForegroundColor Cyan
 
 try {
-    # ------------------------------------------------------------------
-    # 1. THE OFFLINE BUNKER (Keeping Microsoft's auditors at bay)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 1: THE OFFLINE BUNKER (Keeping Microsoft's auditors at bay)
+    # ==================================================================
     if (!(Test-Path $LibDir)) {
         Write-Host "[1/8] Creating local lib directory for offline DLLs..." -ForegroundColor Yellow
         New-Item -ItemType Directory -Path $LibDir | Out-Null
@@ -53,9 +53,9 @@ try {
         throw "Blimey! Could not locate project file at: $CsprojPath"
     }
 
-    # ------------------------------------------------------------------
-    # 2. VERSION RESOLUTION (Explicit argument or patch auto-increment)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 2: VERSION RESOLUTION (Explicit argument or patch auto-increment)
+    # ==================================================================
     Write-Host "[2/8] Parsing current project version with absolute style..." -ForegroundColor DarkGray
     [xml]$csproj = Get-Content $CsprojPath
     $propertyGroup = $csproj.Project.PropertyGroup | Select-Object -First 1
@@ -92,9 +92,9 @@ try {
     $csproj.Save($CsprojPath)
     Write-Host "[OK] MashedPotato.csproj elevated to v$newVersion." -ForegroundColor Green
 
-    # ------------------------------------------------------------------
-    # 3. THE SPLIT MANIFEST LAW (MashedPotato.json -> Single Object)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 3: THE SPLIT MANIFEST LAW (MashedPotato.json -> Single Object)
+    # ==================================================================
     if (Test-Path $JsonPath) {
         Write-Host "[3/8] Tailoring plugin manifest without breaking JSON..." -ForegroundColor DarkGray
         $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
@@ -106,9 +106,9 @@ try {
         throw "Good grief! Could not locate plugin JSON at: $JsonPath"
     }
 
-    # ------------------------------------------------------------------
-    # 4. THE REPOSITORY FEED (repo.json -> Root Array with -AsArray)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 4: THE REPOSITORY FEED (repo.json -> Root Array with -AsArray)
+    # ==================================================================
     if (Test-Path $RepoJsonPath) {
         Write-Host "[4/8] Stamping repository feed for the masses..." -ForegroundColor DarkGray
         $jsonContent = Get-Content $RepoJsonPath -Raw
@@ -167,9 +167,9 @@ try {
         throw "Good grief! Could not locate repo.json at: $RepoJsonPath"
     }
 
-    # ------------------------------------------------------------------
-    # 5. THE STAGING & COMPILATION RITUAL (.NET 10 / API 15)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 5: THE STAGING & COMPILATION RITUAL (.NET 10 / API 15)
+    # ==================================================================
     Write-Host "[5/8] Preparing staging directories..." -ForegroundColor Yellow
     if (Test-Path $StageDir) {
         Remove-Item -Recurse -Force $StageDir
@@ -179,9 +179,9 @@ try {
     Write-Host "[5/8] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Cyan
     dotnet publish $CsprojPath -c Release -o $StageDir --nologo
 
-    # ------------------------------------------------------------------
-    # 6. THE GAME ASSEMBLY SCRUBBER (Banishing foreign DLL ghosts)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 6: THE GAME ASSEMBLY SCRUBBER (Banishing foreign DLL ghosts)
+    # ==================================================================
     Write-Host "[6/8] Scrubbing prohibited core game assemblies & injecting assets..." -ForegroundColor Yellow
 
     $prohibited = @("ImGui*.dll", "FFXIVClientStructs*.dll", "Dalamud*.dll", "Interop*.dll")
@@ -199,18 +199,18 @@ try {
 
     Copy-Item $JsonPath (Join-Path $StageDir "$ProjectName.json")
 
-    # ------------------------------------------------------------------
-    # 7. THE ARCHIVAL VAULT (Flattening latest.zip for Dalamud)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 7: THE ARCHIVAL VAULT (Flattening latest.zip for Dalamud)
+    # ==================================================================
     Write-Host "[7/8] Creating final flat latest.zip..." -ForegroundColor Yellow
     if (Test-Path $ZipPath) {
         Remove-Item $ZipPath -Force
     }
     Compress-Archive -Path "$StageDir\*" -DestinationPath $ZipPath -Force
 
-    # ------------------------------------------------------------------
-    # 8. GIT SANCTUARY & GITHUB ASCENSION
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # STEP 8: THE GIT SANCTUARY & GITHUB ASCENSION
+    # ==================================================================
     Write-Host "[8/8] Purging untracked build artefacts from git index..." -ForegroundColor DarkGray
     git rm -r --cached stage/ 2>$null
     git rm -r --cached MashedPotato/bin/ 2>$null
@@ -219,6 +219,10 @@ try {
     Write-Host "[8/8] Staging architectural masterworks for GitHub..." -ForegroundColor Cyan
     git add .
     git commit -m "🚀 Release v${newVersion}: The 1.5.0.0 Milestone - Flawless Spacing, Tailored UI, and Absolute Geometric Harmony"
+
+    # Refresh the local tracking reference to prevent stale info rejections
+    Write-Host "[8/8] Pulling latest remote changes (rebase mode)..." -ForegroundColor DarkGray
+    git pull --rebase origin main
 
     Write-Host "[8/8] Pushing version ${newVersion} to GitHub origin..." -ForegroundColor Magenta
     git push origin main --force-with-lease
