@@ -1,6 +1,18 @@
-// File: ./MashedPotato/Utils/Service.cs
+/*
+ *  ==================================================================
+ *   _  _   _    _          _   _                      
+ *  | || | | |  (_)        | | | |                     
+ *  | || |_| | ___  ___ ___| |_| |__   ___  ___        
+ *  | || __| |/ / |/ __/ __| __| '_ \ / _ \/ __|       
+ *  | || |_|   <| | (__\__ \ |_| | | |  __/\__ \       
+ *  | |_| \__|_|\_\_|\___|___/\__|_| |_|\___||___/       
+ *                                                     
+ *  [ SERVICE LOCATOR: THE CENTRAL NERVOUS SYSTEM ]
+ *  Unified, streamlined, and blissfully free of architectural clutter.
+ *  ==================================================================
+ */
 
-// File: MashedPotato/Utils/Service.cs
+// File: ./MashedPotato/Utils/Service.cs
 
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
@@ -18,8 +30,6 @@ namespace MashedPotato.Utils
         public static IPluginLog? PluginLog { get; set; }
         public static INamePlateGui? namePlateGui { get; set; }
         public static IObjectTable? objectTable { get; set; }
-        
-        // Added Framework property to resolve the missing definition compiler error
         public static IFramework? framework { get; set; }
 
         public static Plugin? plugin { get; set; }

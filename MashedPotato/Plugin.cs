@@ -1,11 +1,23 @@
-// File: ./MashedPotato/Plugin.cs
+/*
+ *  ==================================================================
+ *   _  _   _    _          _   _                      
+ *  | || | | |  (_)        | | | |                     
+ *  | || |_| | ___  ___ ___| |_| |__   ___  ___        
+ *  | || __| |/ / |/ __/ __| __| '_ \ / _ \/ __|       
+ *  | || |_|   <| | (__\__ \ |_| | | |  __/\__ \       
+ *  | |_| \__|_|\_\_|\___|___/\__|_| |_|\___||___/       
+ *                                                     
+ *  [ PLUGIN KERNEL: UNIFIED WINDOW DISPATCHER ]
+ *  ==================================================================
+ */
 
-// File: MashedPotato/Plugin.cs
+// File: ./MashedPotato/Plugin.cs
 
 using System;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Interface.Windowing;
+using Penumbra.Api.Enums;
 using MashedPotato.Utils;
 using MashedPotato.Windows;
 
@@ -39,7 +51,6 @@ namespace MashedPotato
             this.pluginInterface = pluginInterface;
             this.commandManager = commandManager;
 
-            // Initialise Service locator
             Service.pluginInterface = pluginInterface;
             Service.clientState = clientState;
             Service.commandManager = commandManager;
@@ -51,12 +62,10 @@ namespace MashedPotato
             Service.framework = framework;
             Service.plugin = this;
 
-            // Load Configuration
             Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(pluginInterface);
             Service.configuration = Configuration;
 
-            // Initialise Managers and IPC wrappers
             PenumbraApi = new PenumbraIpc(pluginInterface);
             Service.penumbraApi = PenumbraApi;
 
@@ -66,32 +75,29 @@ namespace MashedPotato
             NameplateManager = new Nameplate();
             Service.nameplate = NameplateManager;
 
-            // Framework loop completely removed from Drawer
             DrawerManager = new Drawer();
             Service.drawer = DrawerManager;
 
-            // Initialise UI Windows
             windowSystem = new WindowSystem(Name);
             
-            var configWindow = new ConfigWindow(this, Configuration);
+            var configWindow = new ConfigWindow(Configuration);
             Service.configWindow = configWindow;
+
             windowSystem.AddWindow(configWindow);
 
             pluginInterface.UiBuilder.Draw += windowSystem.Draw;
+            
             pluginInterface.UiBuilder.OpenConfigUi += () => {
-                configWindow.InvokeConfigChanged();
                 configWindow.Toggle();
             };
 
-            // Register main UI callback to satisfy Dalamud validation checks
             pluginInterface.UiBuilder.OpenMainUi += () => {
                 configWindow.Toggle();
             };
 
-            // Register Commands
             commandManager.AddHandler("/mash", new Dalamud.Game.Command.CommandInfo(OnCommand)
             {
-                HelpMessage = "Toggles the Mashed Potato configuration window or toggles the filter on/off ('/mash on' or '/mash off')."
+                HelpMessage = "Toggles config window. Use '/mash on' or '/mash off'."
             });
         }
 
@@ -103,14 +109,15 @@ namespace MashedPotato
                 Configuration.Save();
                 Service.chatGui?.Print("[Mashed Potato] Filter enabled.");
                 Service.penumbraApi?.RedrawAll();
+                Service.namePlateGui?.RequestRedraw();
             }
             else if (args.Equals("off", StringComparison.OrdinalIgnoreCase))
             {
                 Configuration.enabled = false;
                 Configuration.Save();
                 Service.chatGui?.Print("[Mashed Potato] Filter disabled.");
-                // Immediately trigger a redraw when turned off so characters revert
                 Service.penumbraApi?.RedrawAll(); 
+                Service.namePlateGui?.RequestRedraw();
             }
             else
             {
@@ -122,11 +129,6 @@ namespace MashedPotato
         {
             commandManager.RemoveHandler("/mash");
             pluginInterface.UiBuilder.Draw -= windowSystem.Draw;
-            
-            if (Service.configWindow != null)
-            {
-                pluginInterface.UiBuilder.OpenMainUi -= Service.configWindow.Toggle;
-            }
             
             NameplateManager?.Dispose();
             WhitelistManager?.Dispose();
