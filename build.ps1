@@ -7,15 +7,16 @@
  *  | || |_|   <| | (__\__ \ |_| | | |  __/\__ \       |
  *  |  _| \__|_|\_\_|\___|___/\__|_| |_|\___||___/       |
  *                                                     
- *  [ THE IMMORTAL BUILD & AUTO-BUMP ENGINE ]
- *  Elegantly increments patch versions, enforces split manifests, 
- *  and banishes git ghosts into the shadow realm.
+ *  [ THE DIAL-UP CYBER-DISCO BUILD & PUBLISH ENGINE ]
+ *  Colder than a Polar Bear's toe-nails and faster than 56k dial-up!
+ *  Enforces the Split Manifest Law and smashes bugs into next week.
  *  ==================================================================
 #>
 
 [CmdletBinding()]
 param(
-    [string]$ExplicitVersion = ""
+    [Parameter(Position = 0)]
+    [string]$Version = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,21 +42,21 @@ Write-Host "========================================================" -Foregroun
 
 try {
     # ------------------------------------------------------------------
-    # 1. ENSURE LOCAL LIB DIRECTORY FOR OFFLINE ASSEMBLY SECURITY
+    # 1. THE OFFLINE BUNKER (Keeping Microsoft's auditors at bay)
     # ------------------------------------------------------------------
     if (!(Test-Path $LibDir)) {
-        Write-Host "[*] Creating local lib directory for offline DLLs..." -ForegroundColor Yellow
+        Write-Host "[1/8] Creating local lib directory for offline DLLs..." -ForegroundColor Yellow
         New-Item -ItemType Directory -Path $LibDir | Out-Null
     }
 
     if (!(Test-Path $CsprojPath)) {
-        throw "Could not locate project file at: $CsprojPath"
+        throw "Blimey! Could not locate project file at: $CsprojPath"
     }
 
     # ------------------------------------------------------------------
-    # 2. PARSE & AUTO-INCREMENT VERSION ACROSS MANIFESTS SAFELY
+    # 2. VERSION RESOLUTION (Explicit argument or patch auto-increment)
     # ------------------------------------------------------------------
-    Write-Host "[*] Parsing current project version..." -ForegroundColor DarkGray
+    Write-Host "[2/8] Parsing current project version with absolute style..." -ForegroundColor DarkGray
     [xml]$csproj = Get-Content $CsprojPath
     $propertyGroup = $csproj.Project.PropertyGroup | Select-Object -First 1
 
@@ -64,10 +65,9 @@ try {
         $currentVersion = "1.5.0.0"
     }
 
-    # Determine whether to use explicit override or auto-increment the patch
-    if ($ExplicitVersion -ne "") {
-        $newVersion = $ExplicitVersion
-        Write-Host "[*] Using explicit target version: $newVersion" -ForegroundColor Cyan
+    if ($Version -ne "") {
+        $newVersion = $Version
+        Write-Host "[*] Forcing explicit target version: $newVersion" -ForegroundColor Cyan
     } else {
         $verParts = $currentVersion.Split('.')
         [int]$patch = $verParts[-1]
@@ -77,7 +77,7 @@ try {
         Write-Host "[*] Auto-incrementing patch version: $currentVersion -> $newVersion" -ForegroundColor Green
     }
 
-    # Explicitly set version properties in .csproj
+    # Inject the glorious new version into the project file properties
     $propertyGroup.Version = $newVersion
     if ($propertyGroup.AssemblyVersion) { 
         $propertyGroup.AssemblyVersion = $newVersion 
@@ -93,24 +93,24 @@ try {
     Write-Host "[OK] MashedPotato.csproj elevated to v$newVersion." -ForegroundColor Green
 
     # ------------------------------------------------------------------
-    # 3. UPDATE THE PLUGIN MANIFEST (Strictly Object - NO AsArray)
+    # 3. THE SPLIT MANIFEST LAW (MashedPotato.json -> Single Object)
     # ------------------------------------------------------------------
     if (Test-Path $JsonPath) {
-        Write-Host "[*] Tailoring plugin manifest ($JsonPath)..." -ForegroundColor DarkGray
+        Write-Host "[3/8] Tailoring plugin manifest without breaking JSON..." -ForegroundColor DarkGray
         $pluginJson = Get-Content $JsonPath -Raw | ConvertFrom-Json
         $pluginJson.AssemblyVersion = $newVersion
-        # Serialised strictly as a standard single object to satisfy DalamudPackager
+        # CRITICAL: Serialised as a single object. Do NOT use -AsArray here!
         $pluginJson | ConvertTo-Json -Depth 10 | Set-Content $JsonPath -Encoding UTF8
         Write-Host "[OK] MashedPotato.json updated successfully." -ForegroundColor Green
     } else {
-        throw "Could not locate plugin JSON at: $JsonPath"
+        throw "Good grief! Could not locate plugin JSON at: $JsonPath"
     }
 
     # ------------------------------------------------------------------
-    # 4. UPDATE THE REPOSITORY FEED (Strictly Array - MUST use AsArray)
+    # 4. THE REPOSITORY FEED (repo.json -> Root Array with -AsArray)
     # ------------------------------------------------------------------
     if (Test-Path $RepoJsonPath) {
-        Write-Host "[*] Stamping repository feed ($RepoJsonPath)..." -ForegroundColor DarkGray
+        Write-Host "[4/8] Stamping repository feed for the masses..." -ForegroundColor DarkGray
         $jsonContent = Get-Content $RepoJsonPath -Raw
         $rawRepo = $jsonContent | ConvertFrom-Json
         
@@ -135,7 +135,7 @@ try {
         }
 
         if (-not $found) {
-            Write-Host " ⚠️ Warning: MashedPotato entry missing from repo.json. Appending..." -ForegroundColor Yellow
+            Write-Host " ⚠️ Blimey! MashedPotato entry missing from repo.json. Appending..." -ForegroundColor Yellow
             $newEntry = [PSCustomObject]@{
                 "Author"              = "Lateblight"
                 "Name"                = "Mashed Potato"
@@ -160,34 +160,34 @@ try {
             $repoJson.Add($newEntry)
         }
 
-        # Serialised strictly as a root JSON array using -AsArray
+        # CRITICAL: Serialised strictly as a root JSON array using -AsArray
         $repoJson | ConvertTo-Json -Depth 10 -AsArray | Set-Content $RepoJsonPath -Encoding UTF8
         Write-Host "[OK] repo.json updated with epoch timestamp and v$newVersion." -ForegroundColor Green
     } else {
-        throw "Could not locate repo.json at: $RepoJsonPath"
+        throw "Good grief! Could not locate repo.json at: $RepoJsonPath"
     }
 
     # ------------------------------------------------------------------
-    # 5. PREPARE STAGING & COMPILE .NET 10 PROJECT
+    # 5. THE STAGING & COMPILATION RITUAL (.NET 10 / API 15)
     # ------------------------------------------------------------------
-    Write-Host "[*] Preparing staging directories..." -ForegroundColor Yellow
+    Write-Host "[5/8] Preparing staging directories..." -ForegroundColor Yellow
     if (Test-Path $StageDir) {
         Remove-Item -Recurse -Force $StageDir
     }
     New-Item -ItemType Directory -Path $StageDir | Out-Null
 
-    Write-Host "[*] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Cyan
+    Write-Host "[5/8] Compiling .NET 10 project directly to staging folder..." -ForegroundColor Cyan
     dotnet publish $CsprojPath -c Release -o $StageDir --nologo
 
     # ------------------------------------------------------------------
-    # 6. SCRUB PROHIBITED CORE GAME ASSEMBLIES & INJECT ASSETS
+    # 6. THE GAME ASSEMBLY SCRUBBER (Banishing foreign DLL ghosts)
     # ------------------------------------------------------------------
-    Write-Host "[*] Scrubbing prohibited core game assemblies & injecting assets..." -ForegroundColor Yellow
+    Write-Host "[6/8] Scrubbing prohibited core game assemblies & injecting assets..." -ForegroundColor Yellow
 
     $prohibited = @("ImGui*.dll", "FFXIVClientStructs*.dll", "Dalamud*.dll", "Interop*.dll")
     foreach ($pattern in $prohibited) {
         Get-ChildItem -Path $StageDir -Filter $pattern -ErrorAction SilentlyContinue | ForEach-Object {
-            Write-Host "    -> Scrubbing prohibited assembly: $($_.Name)" -ForegroundColor Red
+            Write-Host "    -> Obliterating prohibited assembly: $($_.Name)" -ForegroundColor Red
             Remove-Item $_.FullName -Force
         }
     }
@@ -200,31 +200,31 @@ try {
     Copy-Item $JsonPath (Join-Path $StageDir "$ProjectName.json")
 
     # ------------------------------------------------------------------
-    # 7. CREATE FLAT latest.zip RELEASE BUNDLE
+    # 7. THE ARCHIVAL VAULT (Flattening latest.zip for Dalamud)
     # ------------------------------------------------------------------
-    Write-Host "[*] Creating final flat latest.zip..." -ForegroundColor Yellow
+    Write-Host "[7/8] Creating final flat latest.zip..." -ForegroundColor Yellow
     if (Test-Path $ZipPath) {
         Remove-Item $ZipPath -Force
     }
     Compress-Archive -Path "$StageDir\*" -DestinationPath $ZipPath -Force
 
     # ------------------------------------------------------------------
-    # 8. PURGE GHOST ARTEFACTS & PUBLISH TO GITHUB
+    # 8. GIT SANCTUARY & GITHUB ASCENSION
     # ------------------------------------------------------------------
-    Write-Host "[*] Purging untracked build artefacts from git index..." -ForegroundColor DarkGray
+    Write-Host "[8/8] Purging untracked build artefacts from git index..." -ForegroundColor DarkGray
     git rm -r --cached stage/ 2>$null
     git rm -r --cached MashedPotato/bin/ 2>$null
     git rm -r --cached MashedPotato/obj/ 2>$null
 
-    Write-Host "[*] Staging architectural masterworks for GitHub..." -ForegroundColor Cyan
+    Write-Host "[8/8] Staging architectural masterworks for GitHub..." -ForegroundColor Cyan
     git add .
-    git commit -m "🚀 Release v${newVersion}: Auto-incremented patch build with absolute geometric harmony"
+    git commit -m "🚀 Release v${newVersion}: The 1.5.0.0 Milestone - Flawless Spacing, Tailored UI, and Absolute Geometric Harmony"
 
-    Write-Host "[*] Pushing version $newVersion to GitHub origin..." -ForegroundColor Magenta
+    Write-Host "[8/8] Pushing version ${newVersion} to GitHub origin..." -ForegroundColor Magenta
     git push origin main --force-with-lease
 
     Write-Host "========================================================" -ForegroundColor Green
-    Write-Host "   ✨ v$newVersion SUCCESSFULLY PUBLISHED TO GITHUB! ✨" -ForegroundColor Green
+    Write-Host "   ✨ v${newVersion} SUCCESSFULLY PUBLISHED TO GITHUB! ✨" -ForegroundColor Green
     Write-Host "========================================================" -ForegroundColor Green
 }
 catch {
