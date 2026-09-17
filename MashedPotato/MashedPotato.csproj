@@ -1,7 +1,7 @@
 <!-- File: MashedPotato/MashedPotato.csproj -->
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>1.5.0.0</Version>
+    <Version>1.5.0.1</Version>
     <TargetFramework>net10.0-windows7.0</TargetFramework>
     <RootNamespace>MashedPotato</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -11,8 +11,8 @@
     <!-- Silences the .NET 10 vulnerability whinging for the Punish feed -->
     <NuGetAudit>false</NuGetAudit>
     <NoWarn>$(NoWarn);NU1900</NoWarn>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <AssemblyVersion>1.5.0.1</AssemblyVersion>
+    <FileVersion>1.5.0.1</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
